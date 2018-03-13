@@ -55,7 +55,19 @@
 				var hemiLight = new THREE.HemisphereLight( 0xddeeff, 0x0f0e0d, 0.02 );
 				scene.add( hemiLight );
 
+				var bulbLight = new THREE.PointLight( 0xffee88, 1, 100, 2 );
+				var bulbGeometry = new THREE.SphereGeometry( 0.02, 16, 8 );
 
+				var bulbMat = new THREE.MeshStandardMaterial( {
+					emissive: 0xffffee,
+					emissiveIntensity: 1,
+					color: 0x000000
+				});
+
+				bulbLight.add( new THREE.Mesh( bulbGeometry, bulbMat ) );
+				bulbLight.position.set( 0, 2, 0 );
+				//bulbLight.castShadow = true;
+				scene.add( bulbLight );
 
 
 				var floorMat = new THREE.MeshStandardMaterial( {
@@ -66,19 +78,20 @@
 				});
 
 				var floorGeometry = new THREE.PlaneBufferGeometry( 20, 20 );
-				var floorMesh = new THREE.Mesh( floorGeometry, floorMat );
+				
 
 				
 
 				var textureLoader = new THREE.TextureLoader();
-				textureLoader.load( "/assets/images/hardwood2_diffuse.jpg", function( map ) {
+				textureLoader.load( "/assets/images/1.jpg", function( map ) {
 					map.wrapS = THREE.RepeatWrapping;
 					map.wrapT = THREE.RepeatWrapping;
 					map.anisotropy = 4;
 					map.repeat.set( 10, 24 );
 					floorMat.map = map;
-					floorMat.needsUpdate = true;
+					//floorMat.needsUpdate = true;
 				} );
+
 				/*textureLoader.load( "/assets/images/hardwood2_bump.jpg", function( map ) {
 					map.wrapS = THREE.RepeatWrapping;
 					map.wrapT = THREE.RepeatWrapping;
@@ -96,9 +109,9 @@
 					floorMat.needsUpdate = true;
 				} );*/
 
-				
-				floorMesh.receiveShadow = true;
-				floorMesh.rotation.x = -Math.PI / 2.0;
+				var floorMesh = new THREE.Mesh( floorGeometry, floorMat );
+				//floorMesh.receiveShadow = true;
+				//floorMesh.rotation.x = -Math.PI / 3.0;
 				scene.add( floorMesh );
 
 				var clock = new THREE.Clock();
