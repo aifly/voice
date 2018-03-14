@@ -8,7 +8,7 @@
 
 <script>
 	import './index.css';
-	import imgs from '../lib/assets.js';
+	import {imgs} from '../lib/assets.js';
 	import zmitiUtil from '../lib/util';
 	import '../lib/html2canvas';
 	import $ from 'jquery';
@@ -52,73 +52,61 @@
 				camera.lookAt(scene.position);
 
 
-				var hemiLight = new THREE.HemisphereLight( 0xddeeff, 0x0f0e0d, 0.02 );
-				scene.add( hemiLight );
-
-				var bulbLight = new THREE.PointLight( 0xffee88, 1, 100, 2 );
-				var bulbGeometry = new THREE.SphereGeometry( 0.02, 16, 8 );
-
-				var bulbMat = new THREE.MeshStandardMaterial( {
-					emissive: 0xffffee,
-					emissiveIntensity: 1,
-					color: 0x000000
-				});
-
-				bulbLight.add( new THREE.Mesh( bulbGeometry, bulbMat ) );
-				bulbLight.position.set( 0, 2, 0 );
-				//bulbLight.castShadow = true;
-				scene.add( bulbLight );
-
-
-				var floorMat = new THREE.MeshStandardMaterial( {
-					//roughness: 0.8,
-					color: 0xff0000,
-					//metalness: 0.2,
-					//bumpScale: 0.0005
-				});
-
-				var floorGeometry = new THREE.PlaneBufferGeometry( 20, 20 );
-				
-
-				
-
 				var textureLoader = new THREE.TextureLoader();
-				textureLoader.load( "/assets/images/1.jpg", function( map ) {
-					map.wrapS = THREE.RepeatWrapping;
-					map.wrapT = THREE.RepeatWrapping;
-					map.anisotropy = 4;
-					map.repeat.set( 10, 24 );
-					floorMat.map = map;
-					//floorMat.needsUpdate = true;
-				} );
+					var imgMap = textureLoader.load(this.imgs.floor);
 
-				/*textureLoader.load( "/assets/images/hardwood2_bump.jpg", function( map ) {
-					map.wrapS = THREE.RepeatWrapping;
-					map.wrapT = THREE.RepeatWrapping;
-					map.anisotropy = 4;
-					map.repeat.set( 10, 24 );
-					floorMat.bumpMap = map;
-					floorMat.needsUpdate = true;
-				} );
-				textureLoader.load( "/assets/images/hardwood2_roughness.jpg", function( map ) {
-					map.wrapS = THREE.RepeatWrapping;
-					map.wrapT = THREE.RepeatWrapping;
-					map.anisotropy = 4;
-					map.repeat.set( 10, 24 );
-					floorMat.roughnessMap = map;
-					floorMat.needsUpdate = true;
-				} );*/
+					imgMap.wrapS = THREE.RepeatWrapping;
+					imgMap.wrapT = THREE.RepeatWrapping;
+					imgMap.anisotropy = 4;
+//					imgMap.repeat.set( 30, 54 );
 
-				var floorMesh = new THREE.Mesh( floorGeometry, floorMat );
-				//floorMesh.receiveShadow = true;
-				//floorMesh.rotation.x = -Math.PI / 3.0;
-				scene.add( floorMesh );
+					var imgMaterial = new THREE.MeshLambertMaterial({
+						map:imgMap
+					});
+					imgMaterial.needUpdate  =true;
+					
+					var imgPlaneGeo = new THREE.PlaneGeometry(100,98,1,1);
+					var imgMesh = new THREE.Mesh(imgPlaneGeo,imgMaterial);
+					imgMesh.position.y = -20;
+					imgMesh.rotation.x = -Math.PI*50/180;
+					//imgMesh.rotation.z = Math.PI*50/180;
 
-				var clock = new THREE.Clock();
+					scene.add(imgMesh);
+
+
+				var r = 30;
+
+				data.length = 10;
+				var angle = 360/data.length;
+				data.forEach((item,i)=>{
+
+					var textureLoader = new THREE.TextureLoader();
+					var imgMap = textureLoader.load(item.img);
+					var imgMaterial = new THREE.MeshLambertMaterial({
+						map:imgMap
+					});
+					
+					var imgPlaneGeo = new THREE.PlaneBufferGeometry(600/30,838/30,100);
+					var imgMesh = new THREE.Mesh(imgPlaneGeo,imgMaterial);
+					//imgMesh.position.z = Math.cos(angle/180*Math.PI*i)*r;
+					imgMesh.position.x = i*30;
+
+					//imgMesh.rotation.y = (angle/180*Math.PI*i);
+
+					console.log(imgMesh.rotation)
+					scene.add(imgMesh);
+				});
+				 
+
+
+
+				
+
+				scene.add(new THREE.AmbientLight( '#fff',.7 ))
+				
 				function animate() {
 
 					var time = Date.now() * 0.0005;
-				 var delta = clock.getDelta();
 
 					renderer.render( scene, camera );
 					requestAnimationFrame( animate );
