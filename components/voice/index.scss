@@ -20,410 +20,441 @@ $color: #fffb88;
 		opacity: 0;
 	}
 
-	.zmiti-index-bg {
-		&.bg-enter-active, &.bg-leave-active {
-			@include transition(1s linear);
-		}
-
-		&.bg-enter, &.bg-leave-to {
-			opacity: 0;
-		}
-
-	}
-
-	.zmiti-leaf2 {
+	.zmiti-btn {
 		@include pos(a);
-		width: 2rem;
-		@include transform(rotate(10deg));
-		left: -.3rem;
-		top: 50vh;
-	}
-
-	.zmiti-leaf3 {
-		@include pos(a);
-		width: 1.5rem;
-		@include transform(rotate(10deg));
-		top: 5vh;
-		right: 0;
-	}
-
-	.zmiti-btns-group {
-		@include pos(a);
-		width: 7rem;
-		left: 1.5rem;
-		bottom: 1rem;
-		@include displayBox(horizontal);
+		width: 2.4rem;
+		height: .8rem;
+		background: #fff;
+		line-height: .8rem;
 		text-align: center;
-		-webkit-box-pack: justify;
-		opacity: 1;
+		color: #ae5553;
+		right: .4rem;
+		bottom: .4rem;
+		@include br(10px);
+	}
 
-		&.btn-opacity-enter-active, &.btn-opacity-leave-active {
-			@include transition(.5s);
-		}
 
-		&.btn-opacity-enter, &.btn-opacity-leave-to {
-			opacity: 0;
-		}
-
-		&.zmiti-btns-group1 {
-			display: block;
-
-			&>div {
-				width: 3.8rem;
-				height: 1rem;
-				margin: 0 auto;
-
-				span {
-					height: 1.2rem;
-					line-height: 1.2rem;
-					@include pos(a);
-					left: 0;
-					top: 0;
-					width: 100%;
-					height: 100%;
-				}
-
-			}
-
-		}
-
-		&>div {
-			//margin: 0 10px;
-			-webkit-box-flex: 1;
-
-			&.active {
-				@include transform(scale(.95));
-			}
-
-			@include pos(r);
-
-			span {
-				@include pos(a);
-				color: $color;
-				left: 0;
-				top: 0;
-				height: 80px;
-				line-height: 80px;
-				width: 100%;
-
-				&.disabled {
-					color: #fff;
-				}
-
-			}
-
-		}
-
+	.zmiti-main{
+		left: 3.8rem;
 	}
 
 	.zmiti-team {
-		@include pos(a);
-		left: 50%;
-		@include transform(translateX(-50%));
-		text-decoration: underline;
-		bottom: .1rem;
-		height: 1rem;
-		line-height: 1rem;
-		text-align: center;
-		font-size: .4rem;
-		color: #6b5419;
+		right: auto;
+		left: .4rem;
 	}
 
-	.zmiti-createimg {
-		///height: 100vh;
-		@include transform(scale(.75));
-		@include transformOrigin(center 20%);
-		//border: 5px solid $color;
-		box-sizing: border-box;
-		@include pos(a);
-		z-index: 102;
-		//left: 50%;
-		//top: 4vh;
-		//@include transform(translate3d(-50%, 0, 0));
+	.zmiti-list {
+		left: 50%;
+		@include transform(translate3d(-50%, 0, 0));
+	}
 
-		img {
-			//	height: 100%;
-			//	width: auto;
-		}
+	ul.zmiti-subject-list {
+		width: 7rem;
+		left: 1.5rem;
+		top: 18vh;
+		@include pos(a);
+		height: 65vh;
+		z-index: 1;
 
 		&:before {
 			content: '';
 			@include pos(a);
-			left: 5px;
-			top: 5px;
-			width: 100%;
-			height: 100%;
-			z-index: -1;
-			background: #a6d2a1;
+			width: $viewW*1.5;
+			height: 50%;
+			left: 50%;
+			margin-left: -$viewW*.75;
+			bottom: -3rem;
+			background: #fefddf;
+			@include br();
+			z-index: 0;
 			display: none;
+			//
 		}
 
-		&.zmiti-scale-enter-active, &.zmiti-scale-leave-active {
-			@include transition(.5s);
-		}
+		li {
+			background: #fff;
+			border: 5px solid #e6cda4;
+			box-sizing: border-box;
+			@include displayBox(vertical);
 
-		&.zmiti-scale-enter, &.zmiti-scale-leave-to {
-			@include transform(scale(1));
-		}
+			.zmiti-voice-title {
+				height: 1rem;
+				width: 100%;
+				@include pos(a);
+				left: 0;
+				top: 0;
 
-		&:after {
-			content: '长按保存图片';
-			@include pos(a);
-			color: #79642e;
-			font-size: .38rem;
-			bottom: 0;
-			left: 101%;
+				img {
+					height: .5rem;
+					width: auto;
+					margin-top: .05rem;
+				}
+
+				span {
+					color: #8d3836;
+					background: #f3eece;
+					@include br(4px);
+					font-size: .36rem;
+					padding: 8px;
+
+					&:nth-of-type(1) {
+					}
+
+					&:nth-of-type(2) {
+						@include pos(a);
+						font-size: .45rem;
+						right: 0;
+						top: 0;
+					}
+
+				}
+
+			}
+
+			.zmiti-voice-name {
+				color: #8d3836;
+				text-align: center;
+				
+				font-size: .45rem;
+				/* height: 1rem;
+				line-height: 1rem; */
+				margin: .15rem auto;
+				width: 100%;
+				width: 4.0rem;
+				@include pos(r);
+
+				&:before {
+					@include pos(a);
+					content: '';
+					bottom: 5px;
+					left: 0;
+					width: 100%;
+					height: 2px;
+					display: none;
+					@include fly-h-gradient-line;
+				}
+
+			}
+
+			.zmiti-ar {
+				@include pos(a);
+				bottom: 0rem;
+				left: .2rem;
+				height: .7rem;
+				width: 1rem;
+
+				&>div {
+					@include pos(a);
+					width: 1rem;
+					height: 3px;
+					background: #8d3836;
+					bottom: .2rem;
+
+					&:before {
+						content: '';
+						@include pos(a);
+						width: .3rem;
+						height: 3px;
+						@include transform(rotate(-45deg));
+						@include transformOrigin(left);
+						left: 0;
+						top: 0;
+						background: #8d3836;
+					}
+
+				}
+
+				&.zmiti-ar1 {
+					@include transform(rotateY(180deg));
+					right: .2rem;
+					left: auto;
+				}
+
+			}
+
+			.zmiti-operator {
+				@include displayBox(horizontal);
+				z-index: 10012;
+				width: 80%;
+				left: 10%;
+				height: 80px;
+				top: auto;
+				background: #ae5553;
+				text-align: center;
+
+				canvas {
+					display: block;
+					border: none;
+					border-right: 1px solid #8d3836;
+				}
+
+				section {
+					text-align: center;
+					width: .8rem;
+					height: 100%;
+					-webkit-box-flex: 1;
+					line-height: 80px;
+
+					&:nth-of-type(2) {
+						img {
+							&.rotate {
+								@include animation(rotate 1s linear);
+							}
+
+						}
+
+					}
+
+					img {
+						width: .6rem;
+					}
+
+				}
+
+			}
+
+			canvas {
+				left: 112px;
+				//@include transform(rotateX(180deg));
+			}
+
+			&.zmiti-page-item {
+				@include transition_transform(.4s);
+			}
+
+			.zmiti-img-C {
+				@include pos(r);
+				width: 4.0rem;
+
+				/* left: 50%;
+				margin-left: -2.3rem; */
+				@include transform3d();
+
+				&:after {
+					content: '';
+					width: 100%;
+					height: .6rem;
+					@include br();
+					@include pos(a);
+					left: 0;
+					bottom: -1.5rem;
+					//background: rgba(0, 0, 0, .3);
+					//-webkit-filter: blur(10px);
+				}
+
+				&:before {
+					content: '';
+					@include pos(a);
+					width: 100%;
+					height: 100%;
+					left: 0;
+					top: 0;
+					box-shadow: 0 0 0 8px #ae5553;
+				}
+
+			}
+
+			&.left {
+				opacity: 1;
+				//@include transform(scale(.7) translate3d(-$viewW/1.5, 0, 0));
+				@include transform(translate3d(-5.66667rem, 0, 0) rotateY(90deg));
+			}
+
+			&.transition {
+				@include transition_transform(.4s);
+			}
+
+			&.left1 {
+				opacity: 0;
+				//@include transition_transform(.4s);
+				//@include transform(scale(.7) translate3d(-5.66667rem, 0, 0));
+				@include transform(translate3d(-$viewW, 0, 0) rotateY(90deg));
+			}
+
+			&.right {
+				opacity: 1;
+				@include transform(translate3d(5.66667rem, 0, 0) rotateY(-90deg));
+			}
+
+			&.right1 {
+				opacity: 0;
+				// @include transition_transform(.4s .22s);
+				@include transform(translate3d($viewW, 0, 0) rotateY(-90deg));
+			}
+
+			&.active {
+				@include transform(rotateY(0));
+				z-index: 100;
+			}
+
 		}
 
 	}
 
-	.zmiti-addone {
-		@include pos(a);
-		width: .8rem;
-		left: 4.3rem;
-		bottom: 23vh;
-		z-index: 10;
+}
+
+.zmiti-team-main-ui {
+	z-index: 1010;
+	background: $bgColor;
+	@include displayBox(vertical);
+	color: #6b5419;
+	opacity: 1;
+
+	&.team-enter-active, &.team-leave-active {
+		@include transition(.5s);
+	}
+
+	&.team-enter, &.team-leave-to {
 		opacity: 0;
-
-		&.animate {
-			@include animation(praise 1.5s linear);
-		}
-
 	}
 
-	.zmiti-brand {
-		@include pos(a);
-		width: 3.6rem;
-		left: .4rem;
-		bottom: 3.8rem;
-		color: $color;
-		@include transform(scale(1) translate3d(0, 0, 1px));
+	.zmiti-team-main {
+		color: #880d07;
+		margin-top: 1rem;
 
-		&>div {
-			@include pos(a);
-			left: 0;
-			top: 0;
-			font-size: .36rem;
-			width: 100%;
-			height: 68px;
-			line-height: 68px;
-			text-align: center;
+		&>h1 {
+			@include displayBox(horizontal);
+			width: 9.7rem;
+			font-weight: normal;
+			font-size: .6rem;
+			height: 2rem;
+
+			&>div:nth-of-type(1), &>div:nth-of-type(3) {
+				margin-top: 40px;
+			}
+
+			&>div:last-of-type {
+			}
+
 		}
 
 		&>section {
-			@include pos(a);
-			width: .8rem;
-			top: 0;
-			left: 30%;
-			opacity: 0;
+			&.zmiti-copyright {
+				@include pos(r);
+				line-height: 1.6rem;
 
-			@-webkit-keyframes praise {
-				0% {
-					opacity: 1;
-					@include transform(translate3d(0, 0, 0));
-				}
-
-				33% {
-					@include transform(translate3d(-.3rem, -.8rem, 0));
-				}
-
-				66% {
-					@include transform(translate3d(.3rem, -2.2rem, 0));
-				}
-
-				100% {
-					@include transform(translate3d(.1rem, -3rem, 0));
-					opacity: 0;
+				&:before {
+					content: '';
+					@include pos(a);
+					width: 100%;
+					height: 1px;
+					background: rgba(0, 0, 0, .2);
+					left: 0;
+					top: 0;
 				}
 
 			}
 
+			font-size: .4rem;
+			width: 8rem;
+			margin: 0 auto;
+			height: 1rem;
+			line-height: 1rem;
+
+			span {
+				padding: 0 10px;
+			}
+
 		}
 
-	}
-
-	.zmiti-bucket {
-		@include pos(a);
-		z-index: 1;
-		bottom: 15vh;
-		left: 1.3rem;
-	}
-
-	.zmiti-person {
-		@include pos(a);
-		z-index: 12;
-		left: 4rem;
-		width: 4rem;
-		bottom: 3rem;
-	}
-
-	.zmiti-qrcode {
-		@include pos(a);
-		width: 2.4rem;
-		left: 3.8rem;
-		bottom: 2vh;
-		font-size: .30rem;
-		color: #725d27;
-
-		span {
-			@include pos(a);
-			left: 0;
-			font-size: 20px;
-			margin-top: -3px;
-			width: 100%;
+		.zmiti-back {
+			background: #ebdfb5;
+			width: 2rem;
+			height: .7rem;
+			line-height: .7rem;
 			text-align: center;
-			//@include transform(scale(.85));
+			@include br(8px);
+			margin: .5rem auto;
+			font-size: .4rem;
+			box-shadow: 0 4px 4px  rgba(0, 0, 0, .5);
 		}
 
 	}
 
-	.zmiti-btn1 {
-		@include pos(a);
-		width: 4rem;
-		left: 3rem;
-		color: $color;
-		bottom: 5vh;
-		@include animation(scale 1s linear infinite alternate);
+}
 
-		span {
-			@include pos(a);
-			width: 100%;
-			height: 68px;
-			line-height: 68px;
-			letter-spacing: 2px;
-			font-size: .45rem;
-			text-align: center;
-			top: 10px;
-		}
+.zmiti-voice-list {
+	z-index: 1000;
+	margin: 0vh auto 0;
 
+	@include displayBox(vertical);
+
+	&.list-enter-active, &.list-leave-active {
+		@include transition(.5s);
 	}
 
-	.zmiti-clip-page {
-		z-index: 1003;
-		background: $bgColor;
-		height: 1200px;
-		top: 50%;
-		margin-top: -600px;
-		@include transform(translate3d(0, 0, 2px));
+	&.list-enter, &.list-leave-to {
 		opacity: 0;
-		z-index: -1;
+	}
 
-		&.show {
-			@include transition(.5s);
-			z-index: 1003;
-			opacity: 1;
-		}
+	ul {
+		@include pos(r);
+		width: 9.8rem;
+		left: .1rem;
+		//top: 6vh;
 
-		&>img {
-			width: 100%;
-			height: 100%;
-		}
-
-		.zmiti-clip-img {
+		&:after {
+			content: '点击图片收听';
 			@include pos(a);
-			bottom: .8rem;
-			left: 0;
-			width: 9rem;
-			left: .5rem;
-
-			.zmiti-qrcode {
-				right: .5rem;
-				left: auto;
-				bottom: .8rem;
-			}
-
-			.zmiti-userinfo {
-				@include pos(a);
-				top: 200px;
-				left: 1rem;
-				color: #947002;
-				font-size: .5rem;
-
-				&>div {
-					display: inline-block;
-					width: 1rem;
-					height: 1rem;
-					@include br();
-				}
-
-				img {
-					width: 1rem;
-					margin-right: .3rem;
-					@include br();
-				}
-
-			}
-
-			.zmiti-rank {
-				@include pos(a);
-				color: #947002;
-				font-size: .8rem;
-				left: 1rem;
-				top: 290px;
-
-				span {
-					font-family: Georgia;
-					font-size: 1rem;
-					top: -.1rem;
-					@include pos(r);
-				}
-
-			}
-
+			left: 50%;
+			top: 100%;
+			width: 3rem;
+			line-height: .7rem;
+			height: .7rem;
+			background: #fff;
+			font-size: .4rem;
+			@include transform(translate3d(-50%, 0, 0) scale(.7));
+			color: #8d3836;
+			text-align: center;
 		}
 
 	}
 
-	.zmiti-team-main-ui {
-		z-index: 1010;
-		background: $bgColor;
-		@include displayBox(vertical);
-		color: #6b5419;
-		opacity: 1;
+	li {
+		div {
+			display: inline-block;
+			width: 1.2rem;
+			box-shadow: 3px 3px 3px rgba(0, 0, 0, .44);
+			opacity: .3;
 
-		&.team-enter-active, &.team-leave-active {
-			@include transition(.5s);
-		}
-
-		&.team-enter, &.team-leave-to {
-			opacity: 0;
-		}
-
-		.zmiti-team-main {
-			&>h1 {
-				@include displayBox(horizontal);
-				width: 9.7rem;
-				font-weight: normal;
-				font-size: .6rem;
-
-				&>div:nth-of-type(1), &>div:nth-of-type(3) {
-					margin-top: 40px;
-				}
-
-				&>div:last-of-type {
-					@include transform(rotateY(180deg));
-				}
-
+			&.show {
+				opacity: 1;
+				@include transition(.2s opacity);
 			}
 
-			&>section {
-				font-size: .5rem;
-				width: 7rem;
-				margin: 0 auto;
-				height: 1rem;
-				line-height: 1rem;
+		}
+
+		box-sizing: border-box;
+		//border: 1px solid red;
+
+		&:nth-of-type(1), &:nth-of-type(3) {
+		}
+
+		@include displayBox(horizontal);
+
+		div {
+			margin-right: 20px;
+			margin-top: 20px;
+			border: 1px solid #fff;
+			box-sizing: border-box;
+
+			&:last-of-type {
+				margin-right: 0;
 			}
 
-			.zmiti-back {
-				background: #6b5419;
-				color: #FFF;
-				width: 2rem;
-				height: 1rem;
-				line-height: 1rem;
-				text-align: center;
-				@include br(10px);
-				margin: .5rem auto;
-				font-size: .5rem;
+		}
+
+		&:last-of-type {
+			margin: .1rem 0;
+			text-align: center;
+
+			div {
+				margin: .2rem .3rem .2rem 0;
+
+				&:nth-of-type(6n) {
+					margin-right: 0;
+				}
+
 			}
 
 		}

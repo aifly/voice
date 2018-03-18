@@ -62,9 +62,8 @@
 				this.rotate = false;
 			});
 
-			return;
 
-			//this.$refs['audio'].volume = .3;
+			audio.volume = .1;
 
 			len && audio.play();
 
@@ -101,10 +100,10 @@
 
 			});
 
-			
 			var s = this;
 			document.addEventListener("WeixinJSBridgeReady", function() {
 				WeixinJSBridge.invoke('getNetworkType', {}, function(e) {
+					audio&&(audio.volume = .1);
 					len && audio.play();
 					s.playAudioMuted();
 				});
@@ -116,11 +115,13 @@
 				document.removeEventListener("WeixinJSBridgeReady", play);
 				document.removeEventListener("YixinJSBridgeReady", play);
 				len && audio.play();
+				audio&&(audio.volume = .1);
 				s.playAudioMuted();
 				
 			};
 
 			if (window.WeixinJSBridge) {
+				audio&&(audio.volume = .1);
 				len && audio.play();
 				s.playAudioMuted();
 			}

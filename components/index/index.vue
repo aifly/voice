@@ -1,15 +1,22 @@
 <template>
-	<div  class="lt-full zmiti-index-main-ui "  :class="{'show':show}">
+	<div  class="lt-full zmiti-index-main-ui " :style="{background: 'url('+imgs.index+') no-repeat center center',backgroundSize:'cover'}"  :class="{'show':show}">
 		
+		<div class="zmiti-btn-group">
+			<div class="zmiti-wyBtn" @touchend='entry(0)' >
+				<img :src="imgs.wyBtn" />
+			</div>
+			<div class="zmiti-bzBtn" @touchend='entry(1)' >
+				<img :src="imgs.bzBtn" />
+			</div>
+		</div>
 		
 	</div>
 </template>
 
 <script>
 	import './index.css';
-	import imgs from '../lib/assets.js';
+	import {imgs} from '../lib/assets.js';
 	import zmitiUtil from '../lib/util';
-	import '../lib/html2canvas';
 	import $ from 'jquery';
 	import Toast from '../toast/toast';
 	export default {
@@ -24,6 +31,7 @@
 				showMasks:false,
 				transX:0,
 				transY:0,
+				index:1,//当前的通道。en
 				createImg:'',
 
 			}
@@ -34,10 +42,17 @@
 		
 		methods:{
 
-			entry(){
+			entry(index){
+				this.index = index;
+
 				var {obserable} = this;
 				obserable.trigger({
-					type:'showTreeApp'
+					type:'showVoicePage',
+					data:{
+						url:window.zmitiConfig[this.index].dataUrl,
+						voiceStyle:window.zmitiConfig[this.index].voiceStyle
+					}
+
 				});
 
 			},
@@ -73,52 +88,6 @@
 
 			
 
-			var s = this;
-			s.lastX = '';
-			s.lastY = '';
-			var i =0 ;
-			var startX,startY;
- 			window.addEventListener("deviceorientation", function(event) {
-			      
-
-			     // document.title = event.beta|0;
-			      i++;
-			      if(i===1){
-			      	startY = event.beta;
-			      }
-
-			      var x =  event.gamma|0,
-			      	  y = event.beta|0;
-
-			      if(x<-15){
-			      	x=-15;
-			      }
-			      if(x>15){
-			      	x=15
-			      }
-			      if(y-startY<-10){
-			      	y=-10+startY;
-			      }
-			      if(y-startY>10){
-			      	y=10+startY
-			      }
-
-			      if(s.lastX!==''){
-			     	 
-			      }
-			      if(s.lastY !== ''){
-			      	
-			      }
-
-			      s.transX = x ;
-			      s.transY = y;
-
-			    
-
-
-			    	      
-
-			}, true);
 
 		}
 	}

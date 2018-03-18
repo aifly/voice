@@ -54,7 +54,7 @@ new Vue({
 	*/
 	template: `<div>
 		<Index  v-if='show && !isShare'  :obserable='obserable'></Index>
-		<Music  v-if='show' :obserable='obserable'></Music>
+		<Music   :obserable='obserable'></Music>
 		<Voice  v-if='show' :obserable='obserable'></Voice>
 		
 		
@@ -107,7 +107,7 @@ new Vue({
 				url: window.protocol + '//api.zmiti.com/v2/custom/update_pvnum/',
 				type: 'post',
 				data: {
-					customid: 45
+					customid: 47
 				}
 			}).done((data) => {
 				if (data.getret === 0) {
@@ -134,6 +134,8 @@ new Vue({
 
 		this.src = src;
 
+		this.updatePv();
+
 
 		this.loading(arr, (s) => {
 			this.width = s * 100 | 0;
@@ -153,6 +155,8 @@ new Vue({
 			this.pv += data;
 
 		});
+
+		zmitiUtil.wxConfig(document.title, window.desc);
 
 	}
 })
