@@ -2,11 +2,14 @@
 	<div  class="lt-full zmiti-index-main-ui " :style="{background: 'url('+imgs.index+') no-repeat center center',backgroundSize:'cover'}"  :class="{'show':show}">
 		
 		<div class="zmiti-btn-group">
-			<div class="zmiti-wyBtn" @touchend='entry(0)' >
-				<img :src="imgs.wyBtn" />
+			<div class="zmiti-dbBtn" @touchend='entry(2)' >
+				<img :src="imgs.dbBtn" />
 			</div>
 			<div class="zmiti-bzBtn" @touchend='entry(1)' >
 				<img :src="imgs.bzBtn" />
+			</div>
+			<div class="zmiti-wyBtn" @touchend='entry(0)' >
+				<img :src="imgs.wyBtn" />
 			</div>
 		</div>
 		

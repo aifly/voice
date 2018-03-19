@@ -5,13 +5,15 @@ var imgs = {
 	voice: './assets/images/voice.png',
 	//voice1: './assets/images/voice.gif',
 	bg: './assets/images/bg.jpg',
-	index: './assets/images/index1.jpg',
+	index: './assets/images/index2.jpg',
 	frequency: './assets/images/frequency4.gif',
 	frequency1: './assets/images/frequency2.png',
 	wyBtn: './assets/images/wy-btn.png',
 	bzBtn: './assets/images/bz-btn.png',
+	dbBtn: './assets/images/db-btn.png',
 	wyTongdao: './assets/images/wy-tongdao.png',
 	bzTongdao: './assets/images/bz-tongdao.png',
+	dbTongdao: './assets/images/db-tongdao.png',
 	teamBg: './assets/images/team-bg.jpg',
 	listBg: './assets/images/list-bg.jpg',
 
@@ -38,7 +40,7 @@ window.zmitiConfig = [
 		}
 	},
 	{
-		length:23,
+		length:30,
 
 		dataUrl:'./assets/js/buzhang.json?t='+new Date().getTime(),
 		voiceStyle:{
@@ -52,10 +54,14 @@ window.zmitiConfig = [
 			
 		}
 	},{
-		length:0,
+		length:36,
 		dataUrl:'./assets/js/daibiao.json?t='+new Date().getTime(),
 		voiceStyle:{
-			bgStyle:{}
+			titleImg:imgs.dbTongdao,
+			bgStyle:{
+				background:'url('+imgs.bg+') no-repeat center center',
+				backgroundSize:'cover'
+			}
 		},
 		listStyle:{
 			

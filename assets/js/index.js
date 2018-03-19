@@ -58,29 +58,29 @@
 
 	var _componentsIndexIndex2 = _interopRequireDefault(_componentsIndexIndex);
 
-	var _componentsMusicIndex = __webpack_require__(23);
+	var _componentsMusicIndex = __webpack_require__(12);
 
 	var _componentsMusicIndex2 = _interopRequireDefault(_componentsMusicIndex);
 
-	var _componentsVoiceIndex = __webpack_require__(26);
+	var _componentsVoiceIndex = __webpack_require__(15);
 
 	var _componentsVoiceIndex2 = _interopRequireDefault(_componentsVoiceIndex);
 
-	var _componentsLibObserable = __webpack_require__(31);
+	var _componentsLibObserable = __webpack_require__(18);
 
 	var _componentsLibObserable2 = _interopRequireDefault(_componentsLibObserable);
 
-	var _componentsLibAssets = __webpack_require__(13);
+	var _componentsLibAssets = __webpack_require__(19);
 
-	var _componentsLibUtilJs = __webpack_require__(14);
+	var _componentsLibUtilJs = __webpack_require__(20);
 
 	var _componentsLibUtilJs2 = _interopRequireDefault(_componentsLibUtilJs);
 
-	var _jquery = __webpack_require__(15);
+	var _jquery = __webpack_require__(21);
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
-	__webpack_require__(32);
+	__webpack_require__(22);
 
 	var obserable = new _componentsLibObserable2['default']();
 
@@ -110,7 +110,9 @@
 		},
 		el: '#app',
 		/*<audio ref='audio' src='./assets/music/bg.mp3'  loop></audio>
-	 	
+	 
+	 
+	 
 	 
 	 	<audio src='./assets/music/water.mp3' ref='water'></audio>
 	 	<audio src='./assets/music/photo.mp3' ref='photo'></audio>
@@ -207,8 +209,8 @@
 /***/ (function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global, setImmediate) {/*!
-	 * Vue.js v2.5.13
-	 * (c) 2014-2017 Evan You
+	 * Vue.js v2.5.16
+	 * (c) 2014-2018 Evan You
 	 * Released under the MIT License.
 	 */
 	(function (global, factory) {
@@ -393,9 +395,15 @@
 	});
 
 	/**
-	 * Simple bind, faster than native
+	 * Simple bind polyfill for environments that do not support it... e.g.
+	 * PhantomJS 1.x. Technically we don't need this anymore since native bind is
+	 * now more performant in most browsers, but removing it would be breaking for
+	 * code that was able to run in PhantomJS 1.x, so this must be kept for
+	 * backwards compatibility.
 	 */
-	function bind (fn, ctx) {
+
+	/* istanbul ignore next */
+	function polyfillBind (fn, ctx) {
 	  function boundFn (a) {
 	    var l = arguments.length;
 	    return l
@@ -404,10 +412,18 @@
 	        : fn.call(ctx, a)
 	      : fn.call(ctx)
 	  }
-	  // record original fn length
+
 	  boundFn._length = fn.length;
 	  return boundFn
 	}
+
+	function nativeBind (fn, ctx) {
+	  return fn.bind(ctx)
+	}
+
+	var bind = Function.prototype.bind
+	  ? nativeBind
+	  : polyfillBind;
 
 	/**
 	 * Convert an Array-like object to a real Array.
@@ -638,7 +654,7 @@
 	   * Exposed for legacy reasons
 	   */
 	  _lifecycleHooks: LIFECYCLE_HOOKS
-	});
+	})
 
 	/*  */
 
@@ -682,7 +698,6 @@
 
 	/*  */
 
-
 	// can we use __proto__?
 	var hasProto = '__proto__' in {};
 
@@ -721,7 +736,7 @@
 	var isServerRendering = function () {
 	  if (_isServer === undefined) {
 	    /* istanbul ignore if */
-	    if (!inBrowser && typeof global !== 'undefined') {
+	    if (!inBrowser && !inWeex && typeof global !== 'undefined') {
 	      // detect presence of vue-server-renderer and avoid
 	      // Webpack shimming the process
 	      _isServer = global['process'].env.VUE_ENV === 'server';
@@ -978,8 +993,7 @@
 	// used for static nodes and slot nodes because they may be reused across
 	// multiple renders, cloning them avoids errors when DOM manipulations rely
 	// on their elm reference.
-	function cloneVNode (vnode, deep) {
-	  var componentOptions = vnode.componentOptions;
+	function cloneVNode (vnode) {
 	  var cloned = new VNode(
 	    vnode.tag,
 	    vnode.data,
@@ -987,7 +1001,7 @@
 	    vnode.text,
 	    vnode.elm,
 	    vnode.context,
-	    componentOptions,
+	    vnode.componentOptions,
 	    vnode.asyncFactory
 	  );
 	  cloned.ns = vnode.ns;
@@ -998,24 +1012,7 @@
 	  cloned.fnOptions = vnode.fnOptions;
 	  cloned.fnScopeId = vnode.fnScopeId;
 	  cloned.isCloned = true;
-	  if (deep) {
-	    if (vnode.children) {
-	      cloned.children = cloneVNodes(vnode.children, true);
-	    }
-	    if (componentOptions && componentOptions.children) {
-	      componentOptions.children = cloneVNodes(componentOptions.children, true);
-	    }
-	  }
 	  return cloned
-	}
-
-	function cloneVNodes (vnodes, deep) {
-	  var len = vnodes.length;
-	  var res = new Array(len);
-	  for (var i = 0; i < len; i++) {
-	    res[i] = cloneVNode(vnodes[i], deep);
-	  }
-	  return res
 	}
 
 	/*
@@ -1024,7 +1021,9 @@
 	 */
 
 	var arrayProto = Array.prototype;
-	var arrayMethods = Object.create(arrayProto);[
+	var arrayMethods = Object.create(arrayProto);
+
+	var methodsToPatch = [
 	  'push',
 	  'pop',
 	  'shift',
@@ -1032,7 +1031,12 @@
 	  'splice',
 	  'sort',
 	  'reverse'
-	].forEach(function (method) {
+	];
+
+	/**
+	 * Intercept mutating methods and emit events
+	 */
+	methodsToPatch.forEach(function (method) {
 	  // cache original method
 	  var original = arrayProto[method];
 	  def(arrayMethods, method, function mutator () {
@@ -1063,20 +1067,20 @@
 	var arrayKeys = Object.getOwnPropertyNames(arrayMethods);
 
 	/**
-	 * By default, when a reactive property is set, the new value is
-	 * also converted to become reactive. However when passing down props,
-	 * we don't want to force conversion because the value may be a nested value
-	 * under a frozen data structure. Converting it would defeat the optimization.
+	 * In some cases we may want to disable observation inside a component's
+	 * update computation.
 	 */
-	var observerState = {
-	  shouldConvert: true
-	};
+	var shouldObserve = true;
+
+	function toggleObserving (value) {
+	  shouldObserve = value;
+	}
 
 	/**
-	 * Observer class that are attached to each observed
-	 * object. Once attached, the observer converts target
+	 * Observer class that is attached to each observed
+	 * object. Once attached, the observer converts the target
 	 * object's property keys into getter/setters that
-	 * collect dependencies and dispatches updates.
+	 * collect dependencies and dispatch updates.
 	 */
 	var Observer = function Observer (value) {
 	  this.value = value;
@@ -1102,7 +1106,7 @@
 	Observer.prototype.walk = function walk (obj) {
 	  var keys = Object.keys(obj);
 	  for (var i = 0; i < keys.length; i++) {
-	    defineReactive(obj, keys[i], obj[keys[i]]);
+	    defineReactive(obj, keys[i]);
 	  }
 	};
 
@@ -1152,7 +1156,7 @@
 	  if (hasOwn(value, '__ob__') && value.__ob__ instanceof Observer) {
 	    ob = value.__ob__;
 	  } else if (
-	    observerState.shouldConvert &&
+	    shouldObserve &&
 	    !isServerRendering() &&
 	    (Array.isArray(value) || isPlainObject(value)) &&
 	    Object.isExtensible(value) &&
@@ -1185,6 +1189,9 @@
 
 	  // cater for pre-defined getter/setters
 	  var getter = property && property.get;
+	  if (!getter && arguments.length === 2) {
+	    val = obj[key];
+	  }
 	  var setter = property && property.set;
 
 	  var childOb = !shallow && observe(val);
@@ -1231,6 +1238,11 @@
 	 * already exist.
 	 */
 	function set (target, key, val) {
+	  if ("development" !== 'production' &&
+	    (isUndef(target) || isPrimitive(target))
+	  ) {
+	    warn(("Cannot set reactive property on undefined, null, or primitive value: " + ((target))));
+	  }
 	  if (Array.isArray(target) && isValidArrayIndex(key)) {
 	    target.length = Math.max(target.length, key);
 	    target.splice(key, 1, val);
@@ -1261,6 +1273,11 @@
 	 * Delete a property and trigger change if necessary.
 	 */
 	function del (target, key) {
+	  if ("development" !== 'production' &&
+	    (isUndef(target) || isPrimitive(target))
+	  ) {
+	    warn(("Cannot delete reactive property on undefined, null, or primitive value: " + ((target))));
+	  }
 	  if (Array.isArray(target) && isValidArrayIndex(key)) {
 	    target.splice(key, 1);
 	    return
@@ -1727,12 +1744,18 @@
 	  var prop = propOptions[key];
 	  var absent = !hasOwn(propsData, key);
 	  var value = propsData[key];
-	  // handle boolean props
-	  if (isType(Boolean, prop.type)) {
+	  // boolean casting
+	  var booleanIndex = getTypeIndex(Boolean, prop.type);
+	  if (booleanIndex > -1) {
 	    if (absent && !hasOwn(prop, 'default')) {
 	      value = false;
-	    } else if (!isType(String, prop.type) && (value === '' || value === hyphenate(key))) {
-	      value = true;
+	    } else if (value === '' || value === hyphenate(key)) {
+	      // only cast empty string / same name to boolean if
+	      // boolean has higher priority
+	      var stringIndex = getTypeIndex(String, prop.type);
+	      if (stringIndex < 0 || booleanIndex < stringIndex) {
+	        value = true;
+	      }
 	    }
 	  }
 	  // check default value
@@ -1740,10 +1763,10 @@
 	    value = getPropDefaultValue(vm, prop, key);
 	    // since the default value is a fresh copy,
 	    // make sure to observe it.
-	    var prevShouldConvert = observerState.shouldConvert;
-	    observerState.shouldConvert = true;
+	    var prevShouldObserve = shouldObserve;
+	    toggleObserving(true);
 	    observe(value);
-	    observerState.shouldConvert = prevShouldConvert;
+	    toggleObserving(prevShouldObserve);
 	  }
 	  {
 	    assertProp(prop, key, value, vm, absent);
@@ -1872,17 +1895,20 @@
 	  return match ? match[1] : ''
 	}
 
-	function isType (type, fn) {
-	  if (!Array.isArray(fn)) {
-	    return getType(fn) === getType(type)
+	function isSameType (a, b) {
+	  return getType(a) === getType(b)
+	}
+
+	function getTypeIndex (type, expectedTypes) {
+	  if (!Array.isArray(expectedTypes)) {
+	    return isSameType(expectedTypes, type) ? 0 : -1
 	  }
-	  for (var i = 0, len = fn.length; i < len; i++) {
-	    if (getType(fn[i]) === getType(type)) {
-	      return true
+	  for (var i = 0, len = expectedTypes.length; i < len; i++) {
+	    if (isSameType(expectedTypes[i], type)) {
+	      return i
 	    }
 	  }
-	  /* istanbul ignore next */
-	  return false
+	  return -1
 	}
 
 	/*  */
@@ -1945,19 +1971,19 @@
 	  }
 	}
 
-	// Here we have async deferring wrappers using both micro and macro tasks.
-	// In < 2.4 we used micro tasks everywhere, but there are some scenarios where
-	// micro tasks have too high a priority and fires in between supposedly
+	// Here we have async deferring wrappers using both microtasks and (macro) tasks.
+	// In < 2.4 we used microtasks everywhere, but there are some scenarios where
+	// microtasks have too high a priority and fire in between supposedly
 	// sequential events (e.g. #4521, #6690) or even between bubbling of the same
-	// event (#6566). However, using macro tasks everywhere also has subtle problems
+	// event (#6566). However, using (macro) tasks everywhere also has subtle problems
 	// when state is changed right before repaint (e.g. #6813, out-in transitions).
-	// Here we use micro task by default, but expose a way to force macro task when
+	// Here we use microtask by default, but expose a way to force (macro) task when
 	// needed (e.g. in event handlers attached by v-on).
 	var microTimerFunc;
 	var macroTimerFunc;
 	var useMacroTask = false;
 
-	// Determine (macro) Task defer implementation.
+	// Determine (macro) task defer implementation.
 	// Technically setImmediate should be the ideal choice, but it's only available
 	// in IE. The only polyfill that consistently queues the callback after all DOM
 	// events triggered in the same loop is by using MessageChannel.
@@ -1984,7 +2010,7 @@
 	  };
 	}
 
-	// Determine MicroTask defer implementation.
+	// Determine microtask defer implementation.
 	/* istanbul ignore next, $flow-disable-line */
 	if (typeof Promise !== 'undefined' && isNative(Promise)) {
 	  var p = Promise.resolve();
@@ -2004,7 +2030,7 @@
 
 	/**
 	 * Wrap a function so that if any code inside triggers state change,
-	 * the changes are queued using a Task instead of a MicroTask.
+	 * the changes are queued using a (macro) task instead of a microtask.
 	 */
 	function withMacroTask (fn) {
 	  return fn._withTask || (fn._withTask = function () {
@@ -2093,8 +2119,7 @@
 	  };
 
 	  var hasProxy =
-	    typeof Proxy !== 'undefined' &&
-	    Proxy.toString().match(/native code/);
+	    typeof Proxy !== 'undefined' && isNative(Proxy);
 
 	  if (hasProxy) {
 	    var isBuiltInModifier = makeMap('stop,prevent,self,ctrl,shift,alt,meta,exact');
@@ -2162,7 +2187,7 @@
 	function _traverse (val, seen) {
 	  var i, keys;
 	  var isA = Array.isArray(val);
-	  if ((!isA && !isObject(val)) || Object.isFrozen(val)) {
+	  if ((!isA && !isObject(val)) || Object.isFrozen(val) || val instanceof VNode) {
 	    return
 	  }
 	  if (val.__ob__) {
@@ -3020,29 +3045,30 @@
 	  // update $attrs and $listeners hash
 	  // these are also reactive so they may trigger child update if the child
 	  // used them during render
-	  vm.$attrs = (parentVnode.data && parentVnode.data.attrs) || emptyObject;
+	  vm.$attrs = parentVnode.data.attrs || emptyObject;
 	  vm.$listeners = listeners || emptyObject;
 
 	  // update props
 	  if (propsData && vm.$options.props) {
-	    observerState.shouldConvert = false;
+	    toggleObserving(false);
 	    var props = vm._props;
 	    var propKeys = vm.$options._propKeys || [];
 	    for (var i = 0; i < propKeys.length; i++) {
 	      var key = propKeys[i];
-	      props[key] = validateProp(key, vm.$options.props, propsData, vm);
+	      var propOptions = vm.$options.props; // wtf flow?
+	      props[key] = validateProp(key, propOptions, propsData, vm);
 	    }
-	    observerState.shouldConvert = true;
+	    toggleObserving(true);
 	    // keep a copy of raw propsData
 	    vm.$options.propsData = propsData;
 	  }
 
 	  // update listeners
-	  if (listeners) {
-	    var oldListeners = vm.$options._parentListeners;
-	    vm.$options._parentListeners = listeners;
-	    updateComponentListeners(vm, listeners, oldListeners);
-	  }
+	  listeners = listeners || emptyObject;
+	  var oldListeners = vm.$options._parentListeners;
+	  vm.$options._parentListeners = listeners;
+	  updateComponentListeners(vm, listeners, oldListeners);
+
 	  // resolve slots + force update if has children
 	  if (hasChildren) {
 	    vm.$slots = resolveSlots(renderChildren, parentVnode.context);
@@ -3096,6 +3122,8 @@
 	}
 
 	function callHook (vm, hook) {
+	  // #7573 disable dep collection when invoking lifecycle hooks
+	  pushTarget();
 	  var handlers = vm.$options[hook];
 	  if (handlers) {
 	    for (var i = 0, j = handlers.length; i < j; i++) {
@@ -3109,6 +3137,7 @@
 	  if (vm._hasHookEvent) {
 	    vm.$emit('hook:' + hook);
 	  }
+	  popTarget();
 	}
 
 	/*  */
@@ -3253,7 +3282,7 @@
 
 	/*  */
 
-	var uid$2 = 0;
+	var uid$1 = 0;
 
 	/**
 	 * A watcher parses an expression, collects dependencies,
@@ -3282,7 +3311,7 @@
 	    this.deep = this.user = this.lazy = this.sync = false;
 	  }
 	  this.cb = cb;
-	  this.id = ++uid$2; // uid for batching
+	  this.id = ++uid$1; // uid for batching
 	  this.active = true;
 	  this.dirty = this.lazy; // for lazy watchers
 	  this.deps = [];
@@ -3505,7 +3534,9 @@
 	  var keys = vm.$options._propKeys = [];
 	  var isRoot = !vm.$parent;
 	  // root instance props should be converted
-	  observerState.shouldConvert = isRoot;
+	  if (!isRoot) {
+	    toggleObserving(false);
+	  }
 	  var loop = function ( key ) {
 	    keys.push(key);
 	    var value = validateProp(key, propsOptions, propsData, vm);
@@ -3540,7 +3571,7 @@
 	  };
 
 	  for (var key in propsOptions) loop( key );
-	  observerState.shouldConvert = true;
+	  toggleObserving(true);
 	}
 
 	function initData (vm) {
@@ -3586,11 +3617,15 @@
 	}
 
 	function getData (data, vm) {
+	  // #7573 disable dep collection when invoking data getters
+	  pushTarget();
 	  try {
 	    return data.call(vm, vm)
 	  } catch (e) {
 	    handleError(e, vm, "data()");
 	    return {}
+	  } finally {
+	    popTarget();
 	  }
 	}
 
@@ -3728,7 +3763,7 @@
 
 	function createWatcher (
 	  vm,
-	  keyOrFn,
+	  expOrFn,
 	  handler,
 	  options
 	) {
@@ -3739,7 +3774,7 @@
 	  if (typeof handler === 'string') {
 	    handler = vm[handler];
 	  }
-	  return vm.$watch(keyOrFn, handler, options)
+	  return vm.$watch(expOrFn, handler, options)
 	}
 
 	function stateMixin (Vue) {
@@ -3803,7 +3838,7 @@
 	function initInjections (vm) {
 	  var result = resolveInject(vm.$options.inject, vm);
 	  if (result) {
-	    observerState.shouldConvert = false;
+	    toggleObserving(false);
 	    Object.keys(result).forEach(function (key) {
 	      /* istanbul ignore else */
 	      {
@@ -3817,7 +3852,7 @@
 	        });
 	      }
 	    });
-	    observerState.shouldConvert = true;
+	    toggleObserving(true);
 	  }
 	}
 
@@ -3837,7 +3872,7 @@
 	      var provideKey = inject[key].from;
 	      var source = vm;
 	      while (source) {
-	        if (source._provided && provideKey in source._provided) {
+	        if (source._provided && hasOwn(source._provided, provideKey)) {
 	          result[key] = source._provided[provideKey];
 	          break
 	        }
@@ -3952,6 +3987,14 @@
 
 	/*  */
 
+	function isKeyNotMatch (expect, actual) {
+	  if (Array.isArray(expect)) {
+	    return expect.indexOf(actual) === -1
+	  } else {
+	    return expect !== actual
+	  }
+	}
+
 	/**
 	 * Runtime helper for checking keyCodes from config.
 	 * exposed as Vue.prototype._k
@@ -3960,16 +4003,15 @@
 	function checkKeyCodes (
 	  eventKeyCode,
 	  key,
-	  builtInAlias,
-	  eventKeyName
+	  builtInKeyCode,
+	  eventKeyName,
+	  builtInKeyName
 	) {
-	  var keyCodes = config.keyCodes[key] || builtInAlias;
-	  if (keyCodes) {
-	    if (Array.isArray(keyCodes)) {
-	      return keyCodes.indexOf(eventKeyCode) === -1
-	    } else {
-	      return keyCodes !== eventKeyCode
-	    }
+	  var mappedKeyCode = config.keyCodes[key] || builtInKeyCode;
+	  if (builtInKeyName && eventKeyName && !config.keyCodes[key]) {
+	    return isKeyNotMatch(builtInKeyName, eventKeyName)
+	  } else if (mappedKeyCode) {
+	    return isKeyNotMatch(mappedKeyCode, eventKeyCode)
 	  } else if (eventKeyName) {
 	    return hyphenate(eventKeyName) !== key
 	  }
@@ -4041,11 +4083,9 @@
 	  var cached = this._staticTrees || (this._staticTrees = []);
 	  var tree = cached[index];
 	  // if has already-rendered static tree and not inside v-for,
-	  // we can reuse the same tree by doing a shallow clone.
+	  // we can reuse the same tree.
 	  if (tree && !isInFor) {
-	    return Array.isArray(tree)
-	      ? cloneVNodes(tree)
-	      : cloneVNode(tree)
+	    return tree
 	  }
 	  // otherwise, render a fresh tree.
 	  tree = cached[index] = this.$options.staticRenderFns[index].call(
@@ -4143,6 +4183,24 @@
 	  Ctor
 	) {
 	  var options = Ctor.options;
+	  // ensure the createElement function in functional components
+	  // gets a unique context - this is necessary for correct named slot check
+	  var contextVm;
+	  if (hasOwn(parent, '_uid')) {
+	    contextVm = Object.create(parent);
+	    // $flow-disable-line
+	    contextVm._original = parent;
+	  } else {
+	    // the context vm passed in is a functional context as well.
+	    // in this case we want to make sure we are able to get a hold to the
+	    // real context instance.
+	    contextVm = parent;
+	    // $flow-disable-line
+	    parent = parent._original;
+	  }
+	  var isCompiled = isTrue(options._compiled);
+	  var needNormalization = !isCompiled;
+
 	  this.data = data;
 	  this.props = props;
 	  this.children = children;
@@ -4150,12 +4208,6 @@
 	  this.listeners = data.on || emptyObject;
 	  this.injections = resolveInject(options.inject, parent);
 	  this.slots = function () { return resolveSlots(children, parent); };
-
-	  // ensure the createElement function in functional components
-	  // gets a unique context - this is necessary for correct named slot check
-	  var contextVm = Object.create(parent);
-	  var isCompiled = isTrue(options._compiled);
-	  var needNormalization = !isCompiled;
 
 	  // support for compiled functional template
 	  if (isCompiled) {
@@ -4169,7 +4221,7 @@
 	  if (options._scopeId) {
 	    this._c = function (a, b, c, d) {
 	      var vnode = createElement(contextVm, a, b, c, d, needNormalization);
-	      if (vnode) {
+	      if (vnode && !Array.isArray(vnode)) {
 	        vnode.fnScopeId = options._scopeId;
 	        vnode.fnContext = parent;
 	      }
@@ -4212,14 +4264,28 @@
 	  var vnode = options.render.call(null, renderContext._c, renderContext);
 
 	  if (vnode instanceof VNode) {
-	    vnode.fnContext = contextVm;
-	    vnode.fnOptions = options;
-	    if (data.slot) {
-	      (vnode.data || (vnode.data = {})).slot = data.slot;
+	    return cloneAndMarkFunctionalResult(vnode, data, renderContext.parent, options)
+	  } else if (Array.isArray(vnode)) {
+	    var vnodes = normalizeChildren(vnode) || [];
+	    var res = new Array(vnodes.length);
+	    for (var i = 0; i < vnodes.length; i++) {
+	      res[i] = cloneAndMarkFunctionalResult(vnodes[i], data, renderContext.parent, options);
 	    }
+	    return res
 	  }
+	}
 
-	  return vnode
+	function cloneAndMarkFunctionalResult (vnode, data, contextVm, options) {
+	  // #7817 clone node before setting fnContext, otherwise if the node is reused
+	  // (e.g. it was from a cached normal slot) the fnContext causes named slots
+	  // that should not be matched to match.
+	  var clone = cloneVNode(vnode);
+	  clone.fnContext = contextVm;
+	  clone.fnOptions = options;
+	  if (data.slot) {
+	    (clone.data || (clone.data = {})).slot = data.slot;
+	  }
+	  return clone
 	}
 
 	function mergeProps (to, from) {
@@ -4249,7 +4315,7 @@
 
 	/*  */
 
-	// hooks to be invoked on component VNodes during patch
+	// inline hooks to be invoked on component VNodes during patch
 	var componentVNodeHooks = {
 	  init: function init (
 	    vnode,
@@ -4257,7 +4323,15 @@
 	    parentElm,
 	    refElm
 	  ) {
-	    if (!vnode.componentInstance || vnode.componentInstance._isDestroyed) {
+	    if (
+	      vnode.componentInstance &&
+	      !vnode.componentInstance._isDestroyed &&
+	      vnode.data.keepAlive
+	    ) {
+	      // kept-alive components, treat as a patch
+	      var mountedNode = vnode; // work around flow
+	      componentVNodeHooks.prepatch(mountedNode, mountedNode);
+	    } else {
 	      var child = vnode.componentInstance = createComponentInstanceForVnode(
 	        vnode,
 	        activeInstance,
@@ -4265,10 +4339,6 @@
 	        refElm
 	      );
 	      child.$mount(hydrating ? vnode.elm : undefined, hydrating);
-	    } else if (vnode.data.keepAlive) {
-	      // kept-alive components, treat as a patch
-	      var mountedNode = vnode; // work around flow
-	      componentVNodeHooks.prepatch(mountedNode, mountedNode);
 	    }
 	  },
 
@@ -4403,8 +4473,8 @@
 	    }
 	  }
 
-	  // merge component management hooks onto the placeholder node
-	  mergeHooks(data);
+	  // install component management hooks onto the placeholder node
+	  installComponentHooks(data);
 
 	  // return a placeholder vnode
 	  var name = Ctor.options.name || tag;
@@ -4444,22 +4514,11 @@
 	  return new vnode.componentOptions.Ctor(options)
 	}
 
-	function mergeHooks (data) {
-	  if (!data.hook) {
-	    data.hook = {};
-	  }
+	function installComponentHooks (data) {
+	  var hooks = data.hook || (data.hook = {});
 	  for (var i = 0; i < hooksToMerge.length; i++) {
 	    var key = hooksToMerge[i];
-	    var fromParent = data.hook[key];
-	    var ours = componentVNodeHooks[key];
-	    data.hook[key] = fromParent ? mergeHook$1(ours, fromParent) : ours;
-	  }
-	}
-
-	function mergeHook$1 (one, two) {
-	  return function (a, b, c, d) {
-	    one(a, b, c, d);
-	    two(a, b, c, d);
+	    hooks[key] = componentVNodeHooks[key];
 	  }
 	}
 
@@ -4576,8 +4635,11 @@
 	    // direct component options / constructor
 	    vnode = createComponent(tag, data, context, children);
 	  }
-	  if (isDef(vnode)) {
-	    if (ns) { applyNS(vnode, ns); }
+	  if (Array.isArray(vnode)) {
+	    return vnode
+	  } else if (isDef(vnode)) {
+	    if (isDef(ns)) { applyNS(vnode, ns); }
+	    if (isDef(data)) { registerDeepBindings(data); }
 	    return vnode
 	  } else {
 	    return createEmptyVNode()
@@ -4594,10 +4656,23 @@
 	  if (isDef(vnode.children)) {
 	    for (var i = 0, l = vnode.children.length; i < l; i++) {
 	      var child = vnode.children[i];
-	      if (isDef(child.tag) && (isUndef(child.ns) || isTrue(force))) {
+	      if (isDef(child.tag) && (
+	        isUndef(child.ns) || (isTrue(force) && child.tag !== 'svg'))) {
 	        applyNS(child, ns, force);
 	      }
 	    }
+	  }
+	}
+
+	// ref #5318
+	// necessary to ensure parent re-render when deep bindings like :style and
+	// :class are used on slot nodes
+	function registerDeepBindings (data) {
+	  if (isObject(data.style)) {
+	    traverse(data.style);
+	  }
+	  if (isObject(data.class)) {
+	    traverse(data.class);
 	  }
 	}
 
@@ -4649,20 +4724,17 @@
 	    var render = ref.render;
 	    var _parentVnode = ref._parentVnode;
 
-	    if (vm._isMounted) {
-	      // if the parent didn't update, the slot nodes will be the ones from
-	      // last render. They need to be cloned to ensure "freshness" for this render.
+	    // reset _rendered flag on slots for duplicate slot check
+	    {
 	      for (var key in vm.$slots) {
-	        var slot = vm.$slots[key];
-	        // _rendered is a flag added by renderSlot, but may not be present
-	        // if the slot is passed from manually written render functions
-	        if (slot._rendered || (slot[0] && slot[0].elm)) {
-	          vm.$slots[key] = cloneVNodes(slot, true /* deep */);
-	        }
+	        // $flow-disable-line
+	        vm.$slots[key]._rendered = false;
 	      }
 	    }
 
-	    vm.$scopedSlots = (_parentVnode && _parentVnode.data.scopedSlots) || emptyObject;
+	    if (_parentVnode) {
+	      vm.$scopedSlots = _parentVnode.data.scopedSlots || emptyObject;
+	    }
 
 	    // set parent vnode. this allows render functions to have access
 	    // to the data on the placeholder node.
@@ -4708,13 +4780,13 @@
 
 	/*  */
 
-	var uid$1 = 0;
+	var uid$3 = 0;
 
 	function initMixin (Vue) {
 	  Vue.prototype._init = function (options) {
 	    var vm = this;
 	    // a uid
-	    vm._uid = uid$1++;
+	    vm._uid = uid$3++;
 
 	    var startTag, endTag;
 	    /* istanbul ignore if */
@@ -4845,20 +4917,20 @@
 	  }
 	}
 
-	function Vue$3 (options) {
+	function Vue (options) {
 	  if ("development" !== 'production' &&
-	    !(this instanceof Vue$3)
+	    !(this instanceof Vue)
 	  ) {
 	    warn('Vue is a constructor and should be called with the `new` keyword');
 	  }
 	  this._init(options);
 	}
 
-	initMixin(Vue$3);
-	stateMixin(Vue$3);
-	eventsMixin(Vue$3);
-	lifecycleMixin(Vue$3);
-	renderMixin(Vue$3);
+	initMixin(Vue);
+	stateMixin(Vue);
+	eventsMixin(Vue);
+	lifecycleMixin(Vue);
+	renderMixin(Vue);
 
 	/*  */
 
@@ -5087,13 +5159,15 @@
 	    }
 	  },
 
-	  watch: {
-	    include: function include (val) {
-	      pruneCache(this, function (name) { return matches(val, name); });
-	    },
-	    exclude: function exclude (val) {
-	      pruneCache(this, function (name) { return !matches(val, name); });
-	    }
+	  mounted: function mounted () {
+	    var this$1 = this;
+
+	    this.$watch('include', function (val) {
+	      pruneCache(this$1, function (name) { return matches(val, name); });
+	    });
+	    this.$watch('exclude', function (val) {
+	      pruneCache(this$1, function (name) { return !matches(val, name); });
+	    });
 	  },
 
 	  render: function render () {
@@ -5141,11 +5215,11 @@
 	    }
 	    return vnode || (slot && slot[0])
 	  }
-	};
+	}
 
 	var builtInComponents = {
 	  KeepAlive: KeepAlive
-	};
+	}
 
 	/*  */
 
@@ -5193,20 +5267,25 @@
 	  initAssetRegisters(Vue);
 	}
 
-	initGlobalAPI(Vue$3);
+	initGlobalAPI(Vue);
 
-	Object.defineProperty(Vue$3.prototype, '$isServer', {
+	Object.defineProperty(Vue.prototype, '$isServer', {
 	  get: isServerRendering
 	});
 
-	Object.defineProperty(Vue$3.prototype, '$ssrContext', {
+	Object.defineProperty(Vue.prototype, '$ssrContext', {
 	  get: function get () {
 	    /* istanbul ignore next */
 	    return this.$vnode && this.$vnode.ssrContext
 	  }
 	});
 
-	Vue$3.version = '2.5.13';
+	// expose FunctionalRenderContext for ssr runtime helper installation
+	Object.defineProperty(Vue, 'FunctionalRenderContext', {
+	  value: FunctionalRenderContext
+	});
+
+	Vue.version = '2.5.16';
 
 	/*  */
 
@@ -5480,8 +5559,8 @@
 	  node.textContent = text;
 	}
 
-	function setAttribute (node, key, val) {
-	  node.setAttribute(key, val);
+	function setStyleScope (node, scopeId) {
+	  node.setAttribute(scopeId, '');
 	}
 
 
@@ -5497,7 +5576,7 @@
 		nextSibling: nextSibling,
 		tagName: tagName,
 		setTextContent: setTextContent,
-		setAttribute: setAttribute
+		setStyleScope: setStyleScope
 	});
 
 	/*  */
@@ -5515,11 +5594,11 @@
 	  destroy: function destroy (vnode) {
 	    registerRef(vnode, true);
 	  }
-	};
+	}
 
 	function registerRef (vnode, isRemoval) {
 	  var key = vnode.data.ref;
-	  if (!key) { return }
+	  if (!isDef(key)) { return }
 
 	  var vm = vnode.context;
 	  var ref = vnode.componentInstance || vnode.elm;
@@ -5650,7 +5729,25 @@
 	  }
 
 	  var creatingElmInVPre = 0;
-	  function createElm (vnode, insertedVnodeQueue, parentElm, refElm, nested) {
+
+	  function createElm (
+	    vnode,
+	    insertedVnodeQueue,
+	    parentElm,
+	    refElm,
+	    nested,
+	    ownerArray,
+	    index
+	  ) {
+	    if (isDef(vnode.elm) && isDef(ownerArray)) {
+	      // This vnode was used in a previous render!
+	      // now it's used as a new node, overwriting its elm would cause
+	      // potential patch errors down the road when it's used as an insertion
+	      // reference node. Instead, we clone the node on-demand before creating
+	      // associated DOM element for it.
+	      vnode = ownerArray[index] = cloneVNode(vnode);
+	    }
+
 	    vnode.isRootInsert = !nested; // for transition enter check
 	    if (createComponent(vnode, insertedVnodeQueue, parentElm, refElm)) {
 	      return
@@ -5673,6 +5770,7 @@
 	          );
 	        }
 	      }
+
 	      vnode.elm = vnode.ns
 	        ? nodeOps.createElementNS(vnode.ns, tag)
 	        : nodeOps.createElement(tag, vnode);
@@ -5778,7 +5876,7 @@
 	        checkDuplicateKeys(children);
 	      }
 	      for (var i = 0; i < children.length; ++i) {
-	        createElm(children[i], insertedVnodeQueue, vnode.elm, null, true);
+	        createElm(children[i], insertedVnodeQueue, vnode.elm, null, true, children, i);
 	      }
 	    } else if (isPrimitive(vnode.text)) {
 	      nodeOps.appendChild(vnode.elm, nodeOps.createTextNode(String(vnode.text)));
@@ -5809,12 +5907,12 @@
 	  function setScope (vnode) {
 	    var i;
 	    if (isDef(i = vnode.fnScopeId)) {
-	      nodeOps.setAttribute(vnode.elm, i, '');
+	      nodeOps.setStyleScope(vnode.elm, i);
 	    } else {
 	      var ancestor = vnode;
 	      while (ancestor) {
 	        if (isDef(i = ancestor.context) && isDef(i = i.$options._scopeId)) {
-	          nodeOps.setAttribute(vnode.elm, i, '');
+	          nodeOps.setStyleScope(vnode.elm, i);
 	        }
 	        ancestor = ancestor.parent;
 	      }
@@ -5825,13 +5923,13 @@
 	      i !== vnode.fnContext &&
 	      isDef(i = i.$options._scopeId)
 	    ) {
-	      nodeOps.setAttribute(vnode.elm, i, '');
+	      nodeOps.setStyleScope(vnode.elm, i);
 	    }
 	  }
 
 	  function addVnodes (parentElm, refElm, vnodes, startIdx, endIdx, insertedVnodeQueue) {
 	    for (; startIdx <= endIdx; ++startIdx) {
-	      createElm(vnodes[startIdx], insertedVnodeQueue, parentElm, refElm);
+	      createElm(vnodes[startIdx], insertedVnodeQueue, parentElm, refElm, false, vnodes, startIdx);
 	    }
 	  }
 
@@ -5941,7 +6039,7 @@
 	          ? oldKeyToIdx[newStartVnode.key]
 	          : findIdxInOld(newStartVnode, oldCh, oldStartIdx, oldEndIdx);
 	        if (isUndef(idxInOld)) { // New element
-	          createElm(newStartVnode, insertedVnodeQueue, parentElm, oldStartVnode.elm);
+	          createElm(newStartVnode, insertedVnodeQueue, parentElm, oldStartVnode.elm, false, newCh, newStartIdx);
 	        } else {
 	          vnodeToMove = oldCh[idxInOld];
 	          if (sameVnode(vnodeToMove, newStartVnode)) {
@@ -5950,7 +6048,7 @@
 	            canMove && nodeOps.insertBefore(parentElm, vnodeToMove.elm, oldStartVnode.elm);
 	          } else {
 	            // same key but different element. treat as new element
-	            createElm(newStartVnode, insertedVnodeQueue, parentElm, oldStartVnode.elm);
+	            createElm(newStartVnode, insertedVnodeQueue, parentElm, oldStartVnode.elm, false, newCh, newStartIdx);
 	          }
 	        }
 	        newStartVnode = newCh[++newStartIdx];
@@ -6288,7 +6386,7 @@
 	  destroy: function unbindDirectives (vnode) {
 	    updateDirectives(vnode, emptyNode);
 	  }
-	};
+	}
 
 	function updateDirectives (oldVnode, vnode) {
 	  if (oldVnode.data.directives || vnode.data.directives) {
@@ -6399,7 +6497,7 @@
 	var baseModules = [
 	  ref,
 	  directives
-	];
+	]
 
 	/*  */
 
@@ -6445,7 +6543,9 @@
 	}
 
 	function setAttr (el, key, value) {
-	  if (isBooleanAttr(key)) {
+	  if (el.tagName.indexOf('-') > -1) {
+	    baseSetAttr(el, key, value);
+	  } else if (isBooleanAttr(key)) {
 	    // set attribute for blank value
 	    // e.g. <option disabled>Select one</option>
 	    if (isFalsyAttrValue(value)) {
@@ -6467,35 +6567,39 @@
 	      el.setAttributeNS(xlinkNS, key, value);
 	    }
 	  } else {
-	    if (isFalsyAttrValue(value)) {
-	      el.removeAttribute(key);
-	    } else {
-	      // #7138: IE10 & 11 fires input event when setting placeholder on
-	      // <textarea>... block the first input event and remove the blocker
-	      // immediately.
-	      /* istanbul ignore if */
-	      if (
-	        isIE && !isIE9 &&
-	        el.tagName === 'TEXTAREA' &&
-	        key === 'placeholder' && !el.__ieph
-	      ) {
-	        var blocker = function (e) {
-	          e.stopImmediatePropagation();
-	          el.removeEventListener('input', blocker);
-	        };
-	        el.addEventListener('input', blocker);
-	        // $flow-disable-line
-	        el.__ieph = true; /* IE placeholder patched */
-	      }
-	      el.setAttribute(key, value);
+	    baseSetAttr(el, key, value);
+	  }
+	}
+
+	function baseSetAttr (el, key, value) {
+	  if (isFalsyAttrValue(value)) {
+	    el.removeAttribute(key);
+	  } else {
+	    // #7138: IE10 & 11 fires input event when setting placeholder on
+	    // <textarea>... block the first input event and remove the blocker
+	    // immediately.
+	    /* istanbul ignore if */
+	    if (
+	      isIE && !isIE9 &&
+	      el.tagName === 'TEXTAREA' &&
+	      key === 'placeholder' && !el.__ieph
+	    ) {
+	      var blocker = function (e) {
+	        e.stopImmediatePropagation();
+	        el.removeEventListener('input', blocker);
+	      };
+	      el.addEventListener('input', blocker);
+	      // $flow-disable-line
+	      el.__ieph = true; /* IE placeholder patched */
 	    }
+	    el.setAttribute(key, value);
 	  }
 	}
 
 	var attrs = {
 	  create: updateAttrs,
 	  update: updateAttrs
-	};
+	}
 
 	/*  */
 
@@ -6533,7 +6637,7 @@
 	var klass = {
 	  create: updateClass,
 	  update: updateClass
-	};
+	}
 
 	/*  */
 
@@ -6629,7 +6733,7 @@
 	  } else {
 	    var name = filter.slice(0, i);
 	    var args = filter.slice(i + 1);
-	    return ("_f(\"" + name + "\")(" + exp + "," + args)
+	    return ("_f(\"" + name + "\")(" + exp + (args !== ')' ? ',' + args : args))
 	  }
 	}
 
@@ -6732,7 +6836,9 @@
 	    events = el.events || (el.events = {});
 	  }
 
-	  var newHandler = { value: value };
+	  var newHandler = {
+	    value: value.trim()
+	  };
 	  if (modifiers !== emptyObject) {
 	    newHandler.modifiers = modifiers;
 	  }
@@ -6812,8 +6918,8 @@
 	  if (trim) {
 	    valueExpression =
 	      "(typeof " + baseValueExpression + " === 'string'" +
-	        "? " + baseValueExpression + ".trim()" +
-	        ": " + baseValueExpression + ")";
+	      "? " + baseValueExpression + ".trim()" +
+	      ": " + baseValueExpression + ")";
 	  }
 	  if (number) {
 	    valueExpression = "_n(" + valueExpression + ")";
@@ -6867,6 +6973,9 @@
 
 
 	function parseModel (val) {
+	  // Fix https://github.com/vuejs/vue/pull/7730
+	  // allow v-model="obj.val " (trailing whitespace)
+	  val = val.trim();
 	  len = val.length;
 
 	  if (val.indexOf('[') < 0 || val.lastIndexOf(']') < len - 1) {
@@ -7027,8 +7136,8 @@
 	    'if(Array.isArray($$a)){' +
 	      "var $$v=" + (number ? '_n(' + valueBinding + ')' : valueBinding) + "," +
 	          '$$i=_i($$a,$$v);' +
-	      "if($$el.checked){$$i<0&&(" + value + "=$$a.concat([$$v]))}" +
-	      "else{$$i>-1&&(" + value + "=$$a.slice(0,$$i).concat($$a.slice($$i+1)))}" +
+	      "if($$el.checked){$$i<0&&(" + (genAssignmentCode(value, '$$a.concat([$$v])')) + ")}" +
+	      "else{$$i>-1&&(" + (genAssignmentCode(value, '$$a.slice(0,$$i).concat($$a.slice($$i+1))')) + ")}" +
 	    "}else{" + (genAssignmentCode(value, '$$c')) + "}",
 	    null, true
 	  );
@@ -7071,9 +7180,11 @@
 	  var type = el.attrsMap.type;
 
 	  // warn if v-bind:value conflicts with v-model
+	  // except for inputs with v-bind:type
 	  {
 	    var value$1 = el.attrsMap['v-bind:value'] || el.attrsMap[':value'];
-	    if (value$1) {
+	    var typeBinding = el.attrsMap['v-bind:type'] || el.attrsMap[':type'];
+	    if (value$1 && !typeBinding) {
 	      var binding = el.attrsMap['v-bind:value'] ? 'v-bind:value' : ':value';
 	      warn$1(
 	        binding + "=\"" + value$1 + "\" conflicts with v-model on the same element " +
@@ -7194,7 +7305,7 @@
 	var events = {
 	  create: updateDOMListeners,
 	  update: updateDOMListeners
-	};
+	}
 
 	/*  */
 
@@ -7288,7 +7399,7 @@
 	var domProps = {
 	  create: updateDOMProps,
 	  update: updateDOMProps
-	};
+	}
 
 	/*  */
 
@@ -7449,7 +7560,7 @@
 	var style = {
 	  create: updateStyle,
 	  update: updateStyle
-	};
+	}
 
 	/*  */
 
@@ -7822,13 +7933,15 @@
 	    addTransitionClass(el, startClass);
 	    addTransitionClass(el, activeClass);
 	    nextFrame(function () {
-	      addTransitionClass(el, toClass);
 	      removeTransitionClass(el, startClass);
-	      if (!cb.cancelled && !userWantsControl) {
-	        if (isValidDuration(explicitEnterDuration)) {
-	          setTimeout(cb, explicitEnterDuration);
-	        } else {
-	          whenTransitionEnds(el, type, cb);
+	      if (!cb.cancelled) {
+	        addTransitionClass(el, toClass);
+	        if (!userWantsControl) {
+	          if (isValidDuration(explicitEnterDuration)) {
+	            setTimeout(cb, explicitEnterDuration);
+	          } else {
+	            whenTransitionEnds(el, type, cb);
+	          }
 	        }
 	      }
 	    });
@@ -7928,13 +8041,15 @@
 	      addTransitionClass(el, leaveClass);
 	      addTransitionClass(el, leaveActiveClass);
 	      nextFrame(function () {
-	        addTransitionClass(el, leaveToClass);
 	        removeTransitionClass(el, leaveClass);
-	        if (!cb.cancelled && !userWantsControl) {
-	          if (isValidDuration(explicitLeaveDuration)) {
-	            setTimeout(cb, explicitLeaveDuration);
-	          } else {
-	            whenTransitionEnds(el, type, cb);
+	        if (!cb.cancelled) {
+	          addTransitionClass(el, leaveToClass);
+	          if (!userWantsControl) {
+	            if (isValidDuration(explicitLeaveDuration)) {
+	              setTimeout(cb, explicitLeaveDuration);
+	            } else {
+	              whenTransitionEnds(el, type, cb);
+	            }
 	          }
 	        }
 	      });
@@ -8007,7 +8122,7 @@
 	      rm();
 	    }
 	  }
-	} : {};
+	} : {}
 
 	var platformModules = [
 	  attrs,
@@ -8016,7 +8131,7 @@
 	  domProps,
 	  style,
 	  transition
-	];
+	]
 
 	/*  */
 
@@ -8057,15 +8172,13 @@
 	    } else if (vnode.tag === 'textarea' || isTextInputType(el.type)) {
 	      el._vModifiers = binding.modifiers;
 	      if (!binding.modifiers.lazy) {
+	        el.addEventListener('compositionstart', onCompositionStart);
+	        el.addEventListener('compositionend', onCompositionEnd);
 	        // Safari < 10.2 & UIWebView doesn't fire compositionend when
 	        // switching focus before confirming composition choice
 	        // this also fixes the issue where some browsers e.g. iOS Chrome
 	        // fires "change" instead of "input" on autocomplete.
 	        el.addEventListener('change', onCompositionEnd);
-	        if (!isAndroid) {
-	          el.addEventListener('compositionstart', onCompositionStart);
-	          el.addEventListener('compositionend', onCompositionEnd);
-	        }
 	        /* istanbul ignore if */
 	        if (isIE9) {
 	          el.vmodel = true;
@@ -8199,7 +8312,7 @@
 	    var oldValue = ref.oldValue;
 
 	    /* istanbul ignore if */
-	    if (value === oldValue) { return }
+	    if (!value === !oldValue) { return }
 	    vnode = locateNode(vnode);
 	    var transition$$1 = vnode.data && vnode.data.transition;
 	    if (transition$$1) {
@@ -8229,12 +8342,12 @@
 	      el.style.display = el.__vOriginalDisplay;
 	    }
 	  }
-	};
+	}
 
 	var platformDirectives = {
 	  model: directive,
 	  show: show
-	};
+	}
 
 	/*  */
 
@@ -8423,7 +8536,7 @@
 
 	    return rawChild
 	  }
-	};
+	}
 
 	/*  */
 
@@ -8497,7 +8610,7 @@
 	      this._vnode,
 	      this.kept,
 	      false, // hydrating
-	      true // removeOnly (!important avoids unnecessary moves)
+	      true // removeOnly (!important, avoids unnecessary moves)
 	    );
 	    this._vnode = this.kept;
 	  },
@@ -8564,7 +8677,7 @@
 	      return (this._hasMove = info.hasTransform)
 	    }
 	  }
-	};
+	}
 
 	function callPendingCbs (c) {
 	  /* istanbul ignore if */
@@ -8597,26 +8710,26 @@
 	var platformComponents = {
 	  Transition: Transition,
 	  TransitionGroup: TransitionGroup
-	};
+	}
 
 	/*  */
 
 	// install platform specific utils
-	Vue$3.config.mustUseProp = mustUseProp;
-	Vue$3.config.isReservedTag = isReservedTag;
-	Vue$3.config.isReservedAttr = isReservedAttr;
-	Vue$3.config.getTagNamespace = getTagNamespace;
-	Vue$3.config.isUnknownElement = isUnknownElement;
+	Vue.config.mustUseProp = mustUseProp;
+	Vue.config.isReservedTag = isReservedTag;
+	Vue.config.isReservedAttr = isReservedAttr;
+	Vue.config.getTagNamespace = getTagNamespace;
+	Vue.config.isUnknownElement = isUnknownElement;
 
 	// install platform runtime directives & components
-	extend(Vue$3.options.directives, platformDirectives);
-	extend(Vue$3.options.components, platformComponents);
+	extend(Vue.options.directives, platformDirectives);
+	extend(Vue.options.components, platformComponents);
 
 	// install platform patch function
-	Vue$3.prototype.__patch__ = inBrowser ? patch : noop;
+	Vue.prototype.__patch__ = inBrowser ? patch : noop;
 
 	// public mount method
-	Vue$3.prototype.$mount = function (
+	Vue.prototype.$mount = function (
 	  el,
 	  hydrating
 	) {
@@ -8626,28 +8739,35 @@
 
 	// devtools global hook
 	/* istanbul ignore next */
-	Vue$3.nextTick(function () {
-	  if (config.devtools) {
-	    if (devtools) {
-	      devtools.emit('init', Vue$3);
-	    } else if ("development" !== 'production' && isChrome) {
+	if (inBrowser) {
+	  setTimeout(function () {
+	    if (config.devtools) {
+	      if (devtools) {
+	        devtools.emit('init', Vue);
+	      } else if (
+	        "development" !== 'production' &&
+	        "development" !== 'test' &&
+	        isChrome
+	      ) {
+	        console[console.info ? 'info' : 'log'](
+	          'Download the Vue Devtools extension for a better development experience:\n' +
+	          'https://github.com/vuejs/vue-devtools'
+	        );
+	      }
+	    }
+	    if ("development" !== 'production' &&
+	      "development" !== 'test' &&
+	      config.productionTip !== false &&
+	      typeof console !== 'undefined'
+	    ) {
 	      console[console.info ? 'info' : 'log'](
-	        'Download the Vue Devtools extension for a better development experience:\n' +
-	        'https://github.com/vuejs/vue-devtools'
+	        "You are running Vue in development mode.\n" +
+	        "Make sure to turn on production mode when deploying for production.\n" +
+	        "See more tips at https://vuejs.org/guide/deployment.html"
 	      );
 	    }
-	  }
-	  if ("development" !== 'production' &&
-	    config.productionTip !== false &&
-	    inBrowser && typeof console !== 'undefined'
-	  ) {
-	    console[console.info ? 'info' : 'log'](
-	      "You are running Vue in development mode.\n" +
-	      "Make sure to turn on production mode when deploying for production.\n" +
-	      "See more tips at https://vuejs.org/guide/deployment.html"
-	    );
-	  }
-	}, 0);
+	  }, 0);
+	}
 
 	/*  */
 
@@ -8737,7 +8857,7 @@
 	  staticKeys: ['staticClass'],
 	  transformNode: transformNode,
 	  genData: genData
-	};
+	}
 
 	/*  */
 
@@ -8781,7 +8901,7 @@
 	  staticKeys: ['staticStyle'],
 	  transformNode: transformNode$1,
 	  genData: genData$1
-	};
+	}
 
 	/*  */
 
@@ -8793,7 +8913,7 @@
 	    decoder.innerHTML = html;
 	    return decoder.textContent
 	  }
-	};
+	}
 
 	/*  */
 
@@ -8839,7 +8959,8 @@
 	var startTagClose = /^\s*(\/?)>/;
 	var endTag = new RegExp(("^<\\/" + qnameCapture + "[^>]*>"));
 	var doctype = /^<!DOCTYPE [^>]+>/i;
-	var comment = /^<!--/;
+	// #7298: escape - to avoid being pased as HTML comment when inlined in page
+	var comment = /^<!\--/;
 	var conditionalComment = /^<!\[/;
 
 	var IS_REGEX_CAPTURING_BROKEN = false;
@@ -8969,7 +9090,7 @@
 	        endTagLength = endTag.length;
 	        if (!isPlainTextElement(stackedTag) && stackedTag !== 'noscript') {
 	          text = text
-	            .replace(/<!--([\s\S]*?)-->/g, '$1')
+	            .replace(/<!\--([\s\S]*?)-->/g, '$1') // #7298
 	            .replace(/<!\[CDATA\[([\s\S]*?)]]>/g, '$1');
 	        }
 	        if (shouldIgnoreFirstNewline(stackedTag, text)) {
@@ -9129,7 +9250,7 @@
 
 	var onRE = /^@|^v-on:/;
 	var dirRE = /^v-|^@|^:/;
-	var forAliasRE = /(.*?)\s+(?:in|of)\s+(.*)/;
+	var forAliasRE = /([^]*?)\s+(?:in|of)\s+([^]*)/;
 	var forIteratorRE = /,([^,\}\]]*)(?:,([^,\}\]]*))?$/;
 	var stripParensRE = /^\(|\)$/g;
 
@@ -9467,6 +9588,8 @@
 	  }
 	}
 
+
+
 	function parseFor (exp) {
 	  var inMatch = exp.match(forAliasRE);
 	  if (!inMatch) { return }
@@ -9789,8 +9912,19 @@
 	function preTransformNode (el, options) {
 	  if (el.tag === 'input') {
 	    var map = el.attrsMap;
-	    if (map['v-model'] && (map['v-bind:type'] || map[':type'])) {
-	      var typeBinding = getBindingAttr(el, 'type');
+	    if (!map['v-model']) {
+	      return
+	    }
+
+	    var typeBinding;
+	    if (map[':type'] || map['v-bind:type']) {
+	      typeBinding = getBindingAttr(el, 'type');
+	    }
+	    if (!map.type && !typeBinding && map['v-bind']) {
+	      typeBinding = "(" + (map['v-bind']) + ").type";
+	    }
+
+	    if (typeBinding) {
 	      var ifCondition = getAndRemoveAttr(el, 'v-if', true);
 	      var ifConditionExtra = ifCondition ? ("&&(" + ifCondition + ")") : "";
 	      var hasElse = getAndRemoveAttr(el, 'v-else', true) != null;
@@ -9843,13 +9977,13 @@
 
 	var model$2 = {
 	  preTransformNode: preTransformNode
-	};
+	}
 
 	var modules$1 = [
 	  klass$1,
 	  style$1,
 	  model$2
-	];
+	]
 
 	/*  */
 
@@ -9871,7 +10005,7 @@
 	  model: model,
 	  text: text,
 	  html: html
-	};
+	}
 
 	/*  */
 
@@ -10017,10 +10151,10 @@
 
 	/*  */
 
-	var fnExpRE = /^\s*([\w$_]+|\([^)]*?\))\s*=>|^function\s*\(/;
-	var simplePathRE = /^\s*[A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*|\['.*?']|\[".*?"]|\[\d+]|\[[A-Za-z_$][\w$]*])*\s*$/;
+	var fnExpRE = /^([\w$_]+|\([^)]*?\))\s*=>|^function\s*\(/;
+	var simplePathRE = /^[A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*|\['[^']*?']|\["[^"]*?"]|\[\d+]|\[[A-Za-z_$][\w$]*])*$/;
 
-	// keyCode aliases
+	// KeyboardEvent.keyCode aliases
 	var keyCodes = {
 	  esc: 27,
 	  tab: 9,
@@ -10031,6 +10165,20 @@
 	  right: 39,
 	  down: 40,
 	  'delete': [8, 46]
+	};
+
+	// KeyboardEvent.key aliases
+	var keyNames = {
+	  esc: 'Escape',
+	  tab: 'Tab',
+	  enter: 'Enter',
+	  space: ' ',
+	  // #7806: IE11 uses key names without `Arrow` prefix for arrow keys.
+	  up: ['Up', 'ArrowUp'],
+	  left: ['Left', 'ArrowLeft'],
+	  right: ['Right', 'ArrowRight'],
+	  down: ['Down', 'ArrowDown'],
+	  'delete': ['Backspace', 'Delete']
 	};
 
 	// #4868: modifiers that prevent the execution of the listener
@@ -10115,9 +10263,9 @@
 	      code += genModifierCode;
 	    }
 	    var handlerCode = isMethodPath
-	      ? handler.value + '($event)'
+	      ? ("return " + (handler.value) + "($event)")
 	      : isFunctionExpression
-	        ? ("(" + (handler.value) + ")($event)")
+	        ? ("return (" + (handler.value) + ")($event)")
 	        : handler.value;
 	    /* istanbul ignore if */
 	    return ("function($event){" + code + handlerCode + "}")
@@ -10133,12 +10281,15 @@
 	  if (keyVal) {
 	    return ("$event.keyCode!==" + keyVal)
 	  }
-	  var code = keyCodes[key];
+	  var keyCode = keyCodes[key];
+	  var keyName = keyNames[key];
 	  return (
 	    "_k($event.keyCode," +
 	    (JSON.stringify(key)) + "," +
-	    (JSON.stringify(code)) + "," +
-	    "$event.key)"
+	    (JSON.stringify(keyCode)) + "," +
+	    "$event.key," +
+	    "" + (JSON.stringify(keyName)) +
+	    ")"
 	  )
 	}
 
@@ -10165,7 +10316,7 @@
 	  on: on,
 	  bind: bind$1,
 	  cloak: noop
-	};
+	}
 
 	/*  */
 
@@ -10916,8 +11067,8 @@
 	  return el && el.innerHTML
 	});
 
-	var mount = Vue$3.prototype.$mount;
-	Vue$3.prototype.$mount = function (
+	var mount = Vue.prototype.$mount;
+	Vue.prototype.$mount = function (
 	  el,
 	  hydrating
 	) {
@@ -10999,9 +11150,9 @@
 	  }
 	}
 
-	Vue$3.compile = compileToFunctions;
+	Vue.compile = compileToFunctions;
 
-	return Vue$3;
+	return Vue;
 
 	})));
 
@@ -11011,7 +11162,7 @@
 /* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var apply = Function.prototype.apply;
+	/* WEBPACK VAR INJECTION */(function(global) {var apply = Function.prototype.apply;
 
 	// DOM APIs, for completeness
 
@@ -11062,9 +11213,17 @@
 
 	// setimmediate attaches itself to the global object
 	__webpack_require__(3);
-	exports.setImmediate = setImmediate;
-	exports.clearImmediate = clearImmediate;
+	// On some exotic environments, it's not clear which object `setimmeidate` was
+	// able to install onto.  Search each possibility in the same order as the
+	// `setimmediate` library.
+	exports.setImmediate = (typeof self !== "undefined" && self.setImmediate) ||
+	                       (typeof global !== "undefined" && global.setImmediate) ||
+	                       (this && this.setImmediate);
+	exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
+	                         (typeof global !== "undefined" && global.clearImmediate) ||
+	                         (this && this.clearImmediate);
 
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ }),
 /* 3 */
@@ -11802,8 +11961,8 @@
 /***/ (function(module, exports, __webpack_require__) {
 
 	var __vue_script__, __vue_template__
-	__vue_script__ = __webpack_require__(10)
-	__vue_template__ = __webpack_require__(22)
+	__vue_script__ = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"-!babel-loader?presets[]=es2015&plugins[]=transform-runtime!../../node_modules/vue-loader/lib/selector.js?type=script&index=0!./index.vue\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()))
+	__vue_template__ = __webpack_require__(11)
 	module.exports = __vue_script__ || {}
 	if (module.exports.__esModule) module.exports = module.exports.default
 	if (__vue_template__) { (typeof module.exports === "function" ? module.exports.options : module.exports).template = __vue_template__ }
@@ -11811,7 +11970,7 @@
 	  var hotAPI = require("vue-hot-reload-api")
 	  hotAPI.install(require("vue"), true)
 	  if (!hotAPI.compatible) return
-	  var id = "E:\\project\\voice\\components\\index\\index.vue"
+	  var id = "F:\\xuchang2018\\project\\voice\\components\\index\\index.vue"
 	  if (!module.hot.data) {
 	    hotAPI.createRecord(id, module.exports)
 	  } else {
@@ -11820,164 +11979,136 @@
 	})()}
 
 /***/ }),
-/* 10 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	// <template>
-	// 	<div  class="lt-full zmiti-index-main-ui " :style="{background: 'url('+imgs.index+') no-repeat center center',backgroundSize:'cover'}"  :class="{'show':show}">
-	//
-	// 		<div class="zmiti-btn-group">
-	// 			<div class="zmiti-wyBtn" @touchend='entry(0)' >
-	// 				<img :src="imgs.wyBtn" />
-	// 			</div>
-	// 			<div class="zmiti-bzBtn" @touchend='entry(1)' >
-	// 				<img :src="imgs.bzBtn" />
-	// 			</div>
-	// 		</div>
-	//
-	// 	</div>
-	// </template>
-	//
-	// <script>
-	'use strict';
-
-	Object.defineProperty(exports, '__esModule', {
-		value: true
-	});
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-	__webpack_require__(11);
-
-	var _libAssetsJs = __webpack_require__(13);
-
-	var _libUtil = __webpack_require__(14);
-
-	var _libUtil2 = _interopRequireDefault(_libUtil);
-
-	var _jquery = __webpack_require__(15);
-
-	var _jquery2 = _interopRequireDefault(_jquery);
-
-	var _toastToast = __webpack_require__(17);
-
-	var _toastToast2 = _interopRequireDefault(_toastToast);
-
-	exports['default'] = {
-		props: ['obserable'],
-		name: 'zmitiindex',
-		data: function data() {
-			return {
-				imgs: _libAssetsJs.imgs,
-				show: true,
-				toastMsg: '',
-				showBtns: false,
-				showMasks: false,
-				transX: 0,
-				transY: 0,
-				index: 1, //当前的通道。en
-				createImg: ''
-
-			};
-		},
-		components: {
-			Toast: _toastToast2['default']
-		},
-
-		methods: {
-
-			entry: function entry(index) {
-				this.index = index;
-
-				var obserable = this.obserable;
-
-				obserable.trigger({
-					type: 'showVoicePage',
-					data: {
-						url: window.zmitiConfig[this.index].dataUrl,
-						voiceStyle: window.zmitiConfig[this.index].voiceStyle
-					}
-
-				});
-			},
-
-			toast: function toast() {
-				var _this = this;
-
-				var msg = arguments.length <= 0 || arguments[0] === undefined ? '提交成功' : arguments[0];
-				var time = arguments.length <= 1 || arguments[1] === undefined ? 2000 : arguments[1];
-
-				this.toastMsg = msg;
-				setTimeout(function () {
-					_this.toastMsg = '';
-				}, time);
-			},
-
-			numstart: function numstart() {
-				//this.num =  1;
-			},
-			hideMask: function hideMask() {
-				this.showMasks = false;
-			},
-			showMask: function showMask() {
-				this.showMasks = true;
-			},
-			restart: function restart() {
-				window.location.href = window.location.href.split('?')[0];
-			},
-			afterEnter: function afterEnter() {
-				this.showBtns = true;
-			}
-
-		},
-		mounted: function mounted() {}
-	};
-
-	// </script>
-	module.exports = exports['default'];
-
-/***/ }),
+/* 10 */,
 /* 11 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, exports) {
 
-	// style-loader: Adds some css to the DOM by adding a <style> tag
-
-	// load the styles
-	var content = __webpack_require__(12);
-	if(typeof content === 'string') content = [[module.id, content, '']];
-	// add the styles to the DOM
-	var update = __webpack_require__(8)(content, {});
-	if(content.locals) module.exports = content.locals;
-	// Hot Module Replacement
-	if(false) {
-		// When the styles change, update the <style> tags
-		if(!content.locals) {
-			module.hot.accept("!!../../node_modules/css-loader/index.js!./index.css", function() {
-				var newContent = require("!!../../node_modules/css-loader/index.js!./index.css");
-				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-				update(newContent);
-			});
-		}
-		// When the module is disposed, remove the <style> tags
-		module.hot.dispose(function() { update(); });
-	}
+	module.exports = "\r\n\t<div  class=\"lt-full zmiti-index-main-ui \" :style=\"{background: 'url('+imgs.index+') no-repeat center center',backgroundSize:'cover'}\"  :class=\"{'show':show}\">\r\n\t\t\r\n\t\t<div class=\"zmiti-btn-group\">\r\n\t\t\t<div class=\"zmiti-dbBtn\" @touchend='entry(2)' >\r\n\t\t\t\t<img :src=\"imgs.dbBtn\" />\r\n\t\t\t</div>\r\n\t\t\t<div class=\"zmiti-bzBtn\" @touchend='entry(1)' >\r\n\t\t\t\t<img :src=\"imgs.bzBtn\" />\r\n\t\t\t</div>\r\n\t\t\t<div class=\"zmiti-wyBtn\" @touchend='entry(0)' >\r\n\t\t\t\t<img :src=\"imgs.wyBtn\" />\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t\t\r\n\t</div>\r\n";
 
 /***/ }),
 /* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(7)();
-	// imports
-
-
-	// module
-	exports.push([module.id, ".lt-full{width:100%;height:100%;position:absolute;left:0;top:0}.zmiti-text-overflow{overflow:hidden;white-space:nowrap;word-break:break-all;text-overflow:ellipsis;-webkit-text-overflow:ellipsis}.zmiti-play{width:.8rem;height:.8rem;border-radius:50%;position:fixed;z-index:1000;right:.5rem;top:.5rem}.zmiti-play.rotate{-webkit-animation:rotate 5s linear infinite;animation:rotate 5s linear infinite}@-webkit-keyframes rotate{to{-webkit-transform:rotate(360deg);transform:rotate(360deg)}}.zmiti-index-main-ui{overflow:hidden;width:10rem;left:50% !important;margin-left:-375px;background:#fcfff8}.zmiti-index-main-ui .zmiti-btn-group{position:absolute;z-index:10;width:100%;top:50%;display:-webkit-box;-webkit-box-align:center;-webkit-box-pack:center;-webkit-box-orient:horizontal}.zmiti-index-main-ui .zmiti-btn-group .zmiti-wyBtn,.zmiti-index-main-ui .zmiti-btn-group .zmiti-bzBtn{margin:0 30px;width:3rem;-webkit-animation:scale 0.7s infinite linear alternate;animation:scale 0.7s infinite linear alternate}.zmiti-index-main-ui .zmiti-btn-group .zmiti-bzBtn{-webkit-animation:scale 0.7s 0.4s infinite linear alternate;animation:scale 0.7s 0.4s infinite linear alternate}.zmiti-loading{z-index:1000}.zmiti-loading .zmiti-loading-ui{width:6rem;left:2rem;position:absolute;top:6rem}.zmiti-loading .zmiti-loading-ui .zmiti-loading-bar{width:2rem;border-radius:10px;position:relative;margin:0 auto}.zmiti-loading .zmiti-loading-ui .zmiti-loading-bar:before{content:'';border-radius:10px;position:absolute;left:0;top:0;width:100%;height:100%;box-shadow:0 0 3px rgba(255,255,255,0.5)}.zmiti-loading .zmiti-loading-ui .zmiti-loading-bar .zmiti-target{width:.4rem;height:.4rem;border-radius:50%;background:#fff;left:50%;top:.4rem;position:absolute;margin-left:-.2rem;-webkit-animation:scale linear 2s infinite alternate;animation:scale linear 2s infinite alternate}.zmiti-loading .zmiti-loading-ui .zmiti-progress{margin-top:.5rem;text-align:center;color:#fff;font-family:Georgia;font-size:.7rem}\r\n/*# sourceMappingURL=index.css.map */\r\n", ""]);
-
-	// exports
-
+	var __vue_script__, __vue_template__
+	__vue_script__ = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"-!babel-loader?presets[]=es2015&plugins[]=transform-runtime!../../node_modules/vue-loader/lib/selector.js?type=script&index=0!./index.vue\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()))
+	__vue_template__ = __webpack_require__(14)
+	module.exports = __vue_script__ || {}
+	if (module.exports.__esModule) module.exports = module.exports.default
+	if (__vue_template__) { (typeof module.exports === "function" ? module.exports.options : module.exports).template = __vue_template__ }
+	if (false) {(function () {  module.hot.accept()
+	  var hotAPI = require("vue-hot-reload-api")
+	  hotAPI.install(require("vue"), true)
+	  if (!hotAPI.compatible) return
+	  var id = "F:\\xuchang2018\\project\\voice\\components\\music\\index.vue"
+	  if (!module.hot.data) {
+	    hotAPI.createRecord(id, module.exports)
+	  } else {
+	    hotAPI.update(id, module.exports, __vue_template__)
+	  }
+	})()}
 
 /***/ }),
-/* 13 */
+/* 13 */,
+/* 14 */
+/***/ (function(module, exports) {
+
+	module.exports = "\r\n\t<div  class=\"lt-full zmiti-music-main-ui \">\r\n\t\t<audio ref='music' v-for='audio in audios' :src='audio.src' :autoplay=\"audio.autoplay\" :loop=\"audio.loop\"></audio>\r\n\r\n\t\t<div  @click='toggleMusic' class='zmiti-play' :class='{\"rotate\":rotate}' :style=\"playStyle\">\r\n\t\t\t<img  :src='imgs.play'/>\r\n\t\t</div>\r\n\t</div>\r\n";
+
+/***/ }),
+/* 15 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	var __vue_script__, __vue_template__
+	__vue_script__ = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"-!babel-loader?presets[]=es2015&plugins[]=transform-runtime!../../node_modules/vue-loader/lib/selector.js?type=script&index=0!./index.vue\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()))
+	__vue_template__ = __webpack_require__(17)
+	module.exports = __vue_script__ || {}
+	if (module.exports.__esModule) module.exports = module.exports.default
+	if (__vue_template__) { (typeof module.exports === "function" ? module.exports.options : module.exports).template = __vue_template__ }
+	if (false) {(function () {  module.hot.accept()
+	  var hotAPI = require("vue-hot-reload-api")
+	  hotAPI.install(require("vue"), true)
+	  if (!hotAPI.compatible) return
+	  var id = "F:\\xuchang2018\\project\\voice\\components\\voice\\index.vue"
+	  if (!module.hot.data) {
+	    hotAPI.createRecord(id, module.exports)
+	  } else {
+	    hotAPI.update(id, module.exports, __vue_template__)
+	  }
+	})()}
+
+/***/ }),
+/* 16 */,
+/* 17 */
+/***/ (function(module, exports) {
+
+	module.exports = "\r\n\t<transition name='main'>\r\n\t\t<div  class=\"lt-full zmiti-tree-main-ui \" :style=\"voiceStyle.bgStyle\"  v-show='show' ref='page'>\r\n\t\t\t<ul v-swipeleft='swipeLeft' v-swiperight='swipeRight' class=\"zmiti-subject-list\"  id=\"zmiti-subject-list\" >\r\n\t\t\t\t\t<li :class=\"voice.className\" :style=\"{background:'#fff url('+imgs.imgBg+') no-repeat center top',backgroundSize:'cover'}\"\r\n\t\t\t\t\tclass=\"lt-full\" v-for='(voice,index) in voiceList' @click='entryDetail(voice)' >\r\n\t\t\t\t\t\t<div class=\"zmiti-voice-title\">\r\n\t\t\t\t\t\t\t<span hidden=\"\">通道好声音</span>\r\n\t\t\t\t\t\t\t<img :src=\"voiceStyle.titleImg\">\r\n\t\t\t\t\t\t\t<span hidden=\"\">{{index+1}}</span>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t<div class=\"zmiti-img-C\" @touchend='playAudio'>\r\n\t\t\t\t\t\t\t<img draggable='false' v-bind:src='voice.img'/>\r\n\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t<div class=\"zmiti-voice-name\">\r\n\t\t\t\t\t\t\t{{voice.name}}\r\n\t\t\t\t\t\t</div>\r\n\r\n\r\n\t\t\t\t\t\t<audio :src='voice.audio' ref='audio'></audio>\r\n\r\n\t\t\t\t\t\t<div class=\"zmiti-operator\">\r\n\t\t\t\t\t\t\t<section class=\"zmiti-start\">\r\n\t\t\t\t\t\t\t\t<img :src=\"imgs.voice\" />\r\n\t\t\t\t\t\t\t</section>\r\n\t\t\t\t\t\t\t<canvas :style=\"{background:'url('+(index === currentIndex && isPlaying ?imgs.frequency:imgs.frequency1)+') no-repeat center center',backgroundSize:'contain'}\" :id='voice.id' ref='canvas' width=\"260\" height=\"70\"></canvas>\r\n\t\t\t\t\t\t\t<section class=\"zmiti-reload\" @touchend='reloadAudio'>\r\n\t\t\t\t\t\t\t\t<img :src=\"imgs.reload\" :class='{\"rotate\":isReload && currentIndex === index}' />\r\n\t\t\t\t\t\t\t</section>\r\n\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t<div class=\"zmiti-ar\" @touchend='initRight'>\r\n\t\t\t\t\t\t\t<div></div>\r\n\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t<div class=\"zmiti-ar zmiti-ar1\" @touchend='initLeft'>\r\n\t\t\t\t\t\t\t<div></div>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\r\n\t\t\t\t\t</li>\r\n\t\t\t\t</ul>\r\n\r\n\t\t\t<div class=\"zmiti-team zmiti-btn\" @touchend='showTeam = true'>\r\n\t\t\t\t制作团队\r\n\t\t\t</div>\r\n\t\t\t\r\n\t\t\t<div  class=\" zmiti-main zmiti-btn\" @touchend='entryIndex'>\r\n\t\t\t\t主通道\r\n\t\t\t</div>\r\n\r\n\t\t\t<div  class=\" zmiti-listen zmiti-btn\" @touchend='showVoiceList'>\r\n\t\t\t\t返回\r\n\t\t\t</div>\r\n\r\n\t\t\t<div  hidden=\"\" class=\"zmiti-listen zmiti-btn\" @touchend='togglePlay'>\r\n\t\t\t\t{{isAutoPlay?'暂停':'依次收听'}}\r\n\t\t\t</div>\r\n\r\n\t\t\t<transition name='team'>\r\n\t\t\t\t<div v-if='showTeam' :style='{background:\"#fff url(\"+imgs.teamBg+\") no-repeat center top\",backgroundSize:\"cover\"}' class=\"zmiti-team-main-ui lt-full\" @touchend='showTeam = false'>\r\n\t\t\t\t\t<div class=\"zmiti-team-main\">\r\n\t\t\t\t\t\t<h1>\r\n\t\t\t\t\t\t\t<div>制作团队</div>\r\n\t\t\t\t\t\t</h1>\r\n\t\t\t\t\t\t<section><span>总策划：</span><span>刘思扬</span></section>\r\n\t\t\t\t\t\t<section><span>总监制：</span><span>刘洁</span><span>陈凯星</span><span>冯瑛冰</span></section>\r\n\t\t\t\t\t\t<section><span>统筹：</span><span>兰红光</span><span>马书平</span></section>\r\n\t\t\t\t\t\t<section><span>监制：</span><span>葛素表</span><span>陈知春</span><span>曹建礼</span><span>李代祥</span></section>\t\r\n\t\t\t\t\t\t<section><span>设计：</span><span>赵丹阳</span></section>\r\n\t\t\t\t\t\t<section><span>记者：</span><span>李尕</span><span>路滨琪</span><span>潘旭</span><span>赖星</span><span>孔令杭</span></section>\r\n\t\t\t\t\t\t<section><span>技术支持：</span><span>雷风侠工作室</span></section>\r\n\t\t\t\t\t\t<section  style=\"margin-top: 30px\" class=\"zmiti-copyright\"><span>新华社新媒体中心、摄影部联合出品</span></section>\r\n\r\n\t\t\t\t\t\t\t\r\n\t\t\t\t\t\t<div class=\"zmiti-back\">返回</div>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</transition>\r\n\r\n\t\t\t<transition name='list'>\r\n\t\t\t\t<div v-if='showList' class=\"zmiti-voice-list lt-full\" :style=\"{background:'url('+imgs.listBg+') no-repeat center top',backgroundSize:'cover'}\">\r\n\t\t\t\t\t<ul>\r\n\t\t\t\t\t\t<li >\r\n\t\t\t\t\t\t\t<div @touchend='entry(item,i)' :class='{\"show\":listIndex >= i}' v-for='(item,i) in voiceList'>\r\n\t\t\t\t\t\t\t\t<img :src=\"item.img\">\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</li>\r\n\t\t\t\t\t</ul>\r\n\t\t\t\t</div>\r\n\t\t\t</transition>\r\n\r\n\t\t\t\r\n\t\t</div>\r\n\t</transition>\r\n";
+
+/***/ }),
+/* 18 */
+/***/ (function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var Obserable = (function () {
+		function Obserable() {
+			_classCallCheck(this, Obserable);
+
+			this.handlers = {};
+		}
+
+		_createClass(Obserable, [{
+			key: "on",
+			value: function on(type, handler) {
+
+				this.handlers[type] = this.handlers[type] || [];
+
+				this.off(type);
+				this.handlers[type].push({ handler: handler, type: type });
+			}
+		}, {
+			key: "off",
+			value: function off(type) {
+				var _this = this;
+
+				this.handlers[type] && this.handlers[type].forEach(function (item, i) {
+					if (item.type === type) {
+						_this.handlers[type].splice(i, 1);
+					};
+				});
+			}
+		}, {
+			key: "trigger",
+			value: function trigger(event) {
+
+				if (!event.target) {
+					event.target = this;
+				}
+
+				if (this.handlers[event.type] instanceof Array) {
+					var handlers = this.handlers[event.type]; //检出被观察者注册的观察者
+					for (var i = 0, len = handlers.length; i < len; i++) {
+						return handlers[i].handler(event.data); //回调函数执行，也就是观察者更新自己
+					}
+				}
+			}
+		}]);
+
+		return Obserable;
+	})();
+
+	exports["default"] = Obserable;
+	module.exports = exports["default"];
+
+/***/ }),
+/* 19 */
 /***/ (function(module, exports) {
 
 	"use strict";
@@ -11994,7 +12125,7 @@
 	module.exports = exports["default"];
 
 /***/ }),
-/* 14 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -12005,7 +12136,7 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
-	var _jquery = __webpack_require__(15);
+	var _jquery = __webpack_require__(21);
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
@@ -12201,7 +12332,7 @@
 	module.exports = exports["default"];
 
 /***/ }),
-/* 15 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -22021,1010 +22152,7 @@
 
 
 /***/ }),
-/* 16 */,
-/* 17 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	var __vue_script__, __vue_template__
-	__webpack_require__(18)
-	__vue_script__ = __webpack_require__(20)
-	__vue_template__ = __webpack_require__(21)
-	module.exports = __vue_script__ || {}
-	if (module.exports.__esModule) module.exports = module.exports.default
-	if (__vue_template__) { (typeof module.exports === "function" ? module.exports.options : module.exports).template = __vue_template__ }
-	if (false) {(function () {  module.hot.accept()
-	  var hotAPI = require("vue-hot-reload-api")
-	  hotAPI.install(require("vue"), true)
-	  if (!hotAPI.compatible) return
-	  var id = "E:\\project\\voice\\components\\toast\\toast.vue"
-	  if (!module.hot.data) {
-	    hotAPI.createRecord(id, module.exports)
-	  } else {
-	    hotAPI.update(id, module.exports, __vue_template__)
-	  }
-	})()}
-
-/***/ }),
-/* 18 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	// style-loader: Adds some css to the DOM by adding a <style> tag
-
-	// load the styles
-	var content = __webpack_require__(19);
-	if(typeof content === 'string') content = [[module.id, content, '']];
-	// add the styles to the DOM
-	var update = __webpack_require__(8)(content, {});
-	if(content.locals) module.exports = content.locals;
-	// Hot Module Replacement
-	if(false) {
-		// When the styles change, update the <style> tags
-		if(!content.locals) {
-			module.hot.accept("!!../../node_modules/css-loader/index.js!../../node_modules/vue-loader/lib/style-rewriter.js?id=_v-13bd1802&file=toast.vue!../../node_modules/vue-loader/lib/selector.js?type=style&index=0!./toast.vue", function() {
-				var newContent = require("!!../../node_modules/css-loader/index.js!../../node_modules/vue-loader/lib/style-rewriter.js?id=_v-13bd1802&file=toast.vue!../../node_modules/vue-loader/lib/selector.js?type=style&index=0!./toast.vue");
-				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-				update(newContent);
-			});
-		}
-		// When the module is disposed, remove the <style> tags
-		module.hot.dispose(function() { update(); });
-	}
-
-/***/ }),
-/* 19 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	exports = module.exports = __webpack_require__(7)();
-	// imports
-
-
-	// module
-	exports.push([module.id, "\r\n\t.zmiti-toast-main-ui{\r\n\t\tposition: fixed;\r\n\t\tbackground: rgba(0,0,0,.5);\r\n\t\tcolor:#fff;\r\n\t\tborder-radius: .3rem;\r\n\t\tpadding:.3rem .5rem;\r\n\t\tleft: 50%;\r\n\t\tz-index: 111111;\r\n\t\ttop: 50%;\r\n\t\t-webkit-transform:translate3d(-50%,-50%,0);\r\n\t\t-webkit-transition:1s;\r\n\t}\r\n\t.zmiti-toast-main-ui.hide{\r\n\t\tdisplay: none;\r\n\t}\r\n", ""]);
-
-	// exports
-
-
-/***/ }),
-/* 20 */
-/***/ (function(module, exports) {
-
-	// <template>
-	// 	<div class="zmiti-toast-main-ui" :class='{"hide":msg === ""}'>
-	// 		{{msg}}
-	// 	</div>
-	// </template>
-	// <script>
-	'use strict';
-
-	Object.defineProperty(exports, '__esModule', {
-		value: true
-	});
-	exports['default'] = {
-		props: ['msg'],
-		data: function data() {
-			return {};
-		},
-		mounted: function mounted() {}
-	};
-
-	// </script>
-	// <style>
-	// 	.zmiti-toast-main-ui{
-	// 		position: fixed;
-	// 		background: rgba(0,0,0,.5);
-	// 		color:#fff;
-	// 		border-radius: .3rem;
-	// 		padding:.3rem .5rem;
-	// 		left: 50%;
-	// 		z-index: 111111;
-	// 		top: 50%;
-	// 		-webkit-transform:translate3d(-50%,-50%,0);
-	// 		-webkit-transition:1s;
-	// 	}
-	// 	.zmiti-toast-main-ui.hide{
-	// 		display: none;
-	// 	}
-	// </style>
-	module.exports = exports['default'];
-
-/***/ }),
-/* 21 */
-/***/ (function(module, exports) {
-
-	module.exports = "\r\n\t<div class=\"zmiti-toast-main-ui\" :class='{\"hide\":msg === \"\"}'>\r\n\t\t{{msg}}\r\n\t</div>\r\n";
-
-/***/ }),
 /* 22 */
-/***/ (function(module, exports) {
-
-	module.exports = "\n\t<div  class=\"lt-full zmiti-index-main-ui \" :style=\"{background: 'url('+imgs.index+') no-repeat center center',backgroundSize:'cover'}\"  :class=\"{'show':show}\">\n\t\t\n\t\t<div class=\"zmiti-btn-group\">\n\t\t\t<div class=\"zmiti-wyBtn\" @touchend='entry(0)' >\n\t\t\t\t<img :src=\"imgs.wyBtn\" />\n\t\t\t</div>\n\t\t\t<div class=\"zmiti-bzBtn\" @touchend='entry(1)' >\n\t\t\t\t<img :src=\"imgs.bzBtn\" />\n\t\t\t</div>\n\t\t</div>\n\t\t\n\t</div>\n";
-
-/***/ }),
-/* 23 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	var __vue_script__, __vue_template__
-	__vue_script__ = __webpack_require__(24)
-	__vue_template__ = __webpack_require__(25)
-	module.exports = __vue_script__ || {}
-	if (module.exports.__esModule) module.exports = module.exports.default
-	if (__vue_template__) { (typeof module.exports === "function" ? module.exports.options : module.exports).template = __vue_template__ }
-	if (false) {(function () {  module.hot.accept()
-	  var hotAPI = require("vue-hot-reload-api")
-	  hotAPI.install(require("vue"), true)
-	  if (!hotAPI.compatible) return
-	  var id = "E:\\project\\voice\\components\\music\\index.vue"
-	  if (!module.hot.data) {
-	    hotAPI.createRecord(id, module.exports)
-	  } else {
-	    hotAPI.update(id, module.exports, __vue_template__)
-	  }
-	})()}
-
-/***/ }),
-/* 24 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	// <template>
-	// 	<div  class="lt-full zmiti-music-main-ui ">
-	// 		<audio ref='music' v-for='audio in audios' :src='audio.src' :autoplay="audio.autoplay" :loop="audio.loop"></audio>
-	//
-	// 		<div  @click='toggleMusic' class='zmiti-play' :class='{"rotate":rotate}' :style="playStyle">
-	// 			<img  :src='imgs.play'/>
-	// 		</div>
-	// 	</div>
-	// </template>
-	//
-	// <script>
-	'use strict';
-
-	Object.defineProperty(exports, '__esModule', {
-		value: true
-	});
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-	var _jquery = __webpack_require__(15);
-
-	var _jquery2 = _interopRequireDefault(_jquery);
-
-	var _libAssets = __webpack_require__(13);
-
-	var audios = [];
-
-	for (var music in _libAssets.musics) {
-		audios.push(_libAssets.musics[music]);
-	}
-
-	exports['default'] = {
-		props: ['obserable'],
-		name: 'zmitiindex',
-		data: function data() {
-			return {
-				audios: audios,
-				imgs: _libAssets.imgs,
-				rotate: false,
-				playStyle: {}
-			};
-		},
-		components: {},
-
-		methods: {
-
-			toggleMusic: function toggleMusic() {
-				var music = this.$refs['music'][0];
-				music[music.paused ? 'play' : 'pause']();
-			},
-			playAudioMuted: function playAudioMuted() {
-				//静音播放
-				this.audios.forEach(function (audio, i) {
-					if (i > 0) {
-						if (audio.autoplay) {
-							audio.muted = true; //静音
-							audio.play();
-						}
-					}
-				});
-			}
-		},
-		mounted: function mounted() {
-			var _this = this;
-
-			var obserable = this.obserable;
-
-			var audio = this.$refs['music'][0];
-			var len = audio;
-			len && (0, _jquery2['default'])(audio).on('play', function () {
-				_this.rotate = true;
-			}).on('pause', function () {
-				_this.rotate = false;
-			});
-
-			audio.volume = .1;
-
-			len && audio.play();
-
-			this.playAudioMuted();
-
-			obserable.on('playVoice', function (key) {
-				_this.audios.forEach(function (audio, i) {
-					if (i > 0) {
-						if (audio.name === key) {
-							_this.$refs['music'][i].currentTime = 0;
-							_this.$refs['music'][i].muted = false; //取消静音
-							_this.$refs['music'][i].play();
-						}
-					}
-				});
-			});
-
-			obserable.on('pauseVoice', function (key) {
-				_this.audios.forEach(function (audio, i) {
-					if (i > 0) {
-						if (audio.name === key) {
-							//audio.currentTime = 0;
-							_this.$refs['music'][i].muted = false; //取消静音
-							_this.$refs['music'][i].pause();
-						}
-					}
-				});
-			});
-
-			obserable.on('setPlay', function (data) {
-
-				_this.playStyle = data;
-			});
-
-			var s = this;
-			document.addEventListener("WeixinJSBridgeReady", function () {
-				WeixinJSBridge.invoke('getNetworkType', {}, function (e) {
-					audio && (audio.volume = .1);
-					len && audio.play();
-					s.playAudioMuted();
-				});
-			}, false);
-
-			var play = function play() {
-				document.removeEventListener("WeixinJSBridgeReady", play);
-				document.removeEventListener("YixinJSBridgeReady", play);
-				len && audio.play();
-				audio && (audio.volume = .1);
-				s.playAudioMuted();
-			};
-
-			if (window.WeixinJSBridge) {
-				audio && (audio.volume = .1);
-				len && audio.play();
-				s.playAudioMuted();
-			}
-			//weixin
-			if (typeof WeixinJSBridge == "undefined") {
-				document.addEventListener("WeixinJSBridgeReady", play, false);
-				s.playAudioMuted();
-			} else {
-				//yixin
-				document.addEventListener('YixinJSBridgeReady', play, false);
-				len && audio.play();
-				s.playAudioMuted();
-			}
-
-			obserable.on('toggleBgMusic', function (data) {
-
-				var audio = _this.$refs['music'][0];
-				audio[data ? 'play' : 'pause']();
-			});
-		}
-	};
-
-	// </script>
-	module.exports = exports['default'];
-
-/***/ }),
-/* 25 */
-/***/ (function(module, exports) {
-
-	module.exports = "\n\t<div  class=\"lt-full zmiti-music-main-ui \">\n\t\t<audio ref='music' v-for='audio in audios' :src='audio.src' :autoplay=\"audio.autoplay\" :loop=\"audio.loop\"></audio>\n\n\t\t<div  @click='toggleMusic' class='zmiti-play' :class='{\"rotate\":rotate}' :style=\"playStyle\">\n\t\t\t<img  :src='imgs.play'/>\n\t\t</div>\n\t</div>\n";
-
-/***/ }),
-/* 26 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	var __vue_script__, __vue_template__
-	__vue_script__ = __webpack_require__(27)
-	__vue_template__ = __webpack_require__(30)
-	module.exports = __vue_script__ || {}
-	if (module.exports.__esModule) module.exports = module.exports.default
-	if (__vue_template__) { (typeof module.exports === "function" ? module.exports.options : module.exports).template = __vue_template__ }
-	if (false) {(function () {  module.hot.accept()
-	  var hotAPI = require("vue-hot-reload-api")
-	  hotAPI.install(require("vue"), true)
-	  if (!hotAPI.compatible) return
-	  var id = "E:\\project\\voice\\components\\voice\\index.vue"
-	  if (!module.hot.data) {
-	    hotAPI.createRecord(id, module.exports)
-	  } else {
-	    hotAPI.update(id, module.exports, __vue_template__)
-	  }
-	})()}
-
-/***/ }),
-/* 27 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	// <template>
-	// 	<transition name='main'>
-	// 		<div  class="lt-full zmiti-tree-main-ui " :style="voiceStyle.bgStyle"  v-show='show' ref='page'>
-	// 			<ul v-swipeleft='swipeLeft' v-swiperight='swipeRight' class="zmiti-subject-list"  id="zmiti-subject-list" >
-	// 					<li :class="voice.className" :style="{background:'#fff url('+imgs.imgBg+') no-repeat center top',backgroundSize:'cover'}"
-	// 					class="lt-full" v-for='(voice,index) in voiceList' @click='entryDetail(voice)' >
-	// 						<div class="zmiti-voice-title">
-	// 							<span hidden="">通道好声音</span>
-	// 							<img :src="voiceStyle.titleImg">
-	// 							<span hidden="">{{index+1}}</span>
-	// 						</div>
-	// 						<div class="zmiti-img-C" @touchend='playAudio'>
-	// 							<img draggable='false' v-bind:src='voice.img'/>
-	// 						</div>
-	//
-	// 						<div class="zmiti-voice-name">
-	// 							{{voice.name}}
-	// 						</div>
-	//
-	//
-	// 						<audio :src='voice.audio' ref='audio'></audio>
-	//
-	// 						<div class="zmiti-operator">
-	// 							<section class="zmiti-start">
-	// 								<img :src="imgs.voice" />
-	// 							</section>
-	// 							<canvas :style="{background:'url('+(index === currentIndex && isPlaying ?imgs.frequency:imgs.frequency1)+') no-repeat center center',backgroundSize:'contain'}" :id='voice.id' ref='canvas' width="260" height="70"></canvas>
-	// 							<section class="zmiti-reload" @touchend='reloadAudio'>
-	// 								<img :src="imgs.reload" :class='{"rotate":isReload && currentIndex === index}' />
-	// 							</section>
-	// 						</div>
-	//
-	// 						<div class="zmiti-ar" @touchend='initRight'>
-	// 							<div></div>
-	// 						</div>
-	//
-	// 						<div class="zmiti-ar zmiti-ar1" @touchend='initLeft'>
-	// 							<div></div>
-	// 						</div>
-	//
-	// 					</li>
-	// 				</ul>
-	//
-	// 			<div class="zmiti-team zmiti-btn" @touchend='showTeam = true'>
-	// 				制作团队
-	// 			</div>
-	//
-	// 			<div  class=" zmiti-main zmiti-btn" @touchend='entryIndex'>
-	// 				主通道
-	// 			</div>
-	//
-	// 			<div  class=" zmiti-listen zmiti-btn" @touchend='showVoiceList'>
-	// 				返回
-	// 			</div>
-	//
-	// 			<div  hidden="" class="zmiti-listen zmiti-btn" @touchend='togglePlay'>
-	// 				{{isAutoPlay?'暂停':'依次收听'}}
-	// 			</div>
-	//
-	// 			<transition name='team'>
-	// 				<div v-if='showTeam' :style='{background:"#fff url("+imgs.teamBg+") no-repeat center top",backgroundSize:"cover"}' class="zmiti-team-main-ui lt-full" @touchend='showTeam = false'>
-	// 					<div class="zmiti-team-main">
-	// 						<h1>
-	// 							<div>制作团队</div>
-	// 						</h1>
-	// 						<section><span>总策划：</span><span>刘思扬</span></section>
-	// 						<section><span>总监制：</span><span>刘洁</span><span>陈凯星</span><span>冯瑛冰</span></section>
-	// 						<section><span>统筹：</span><span>兰红光</span><span>马书平</span></section>
-	// 						<section><span>监制：</span><span>葛素表</span><span>陈知春</span><span>曹建礼</span><span>李代祥</span></section>	
-	// 						<section><span>设计：</span><span>赵丹阳</span></section>
-	// 						<section><span>记者：</span><span>李尕</span><span>路滨琪</span><span>潘旭</span><span>赖星</span><span>孔令杭</span></section>
-	// 						<section><span>技术支持：</span><span>雷风侠工作室</span></section>
-	// 						<section  style="margin-top: 30px" class="zmiti-copyright"><span>新华社新媒体中心、摄影部联合出品</span></section>
-	//
-	//
-	// 						<div class="zmiti-back">返回</div>
-	// 					</div>
-	// 				</div>
-	// 			</transition>
-	//
-	// 			<transition name='list'>
-	// 				<div v-if='showList' class="zmiti-voice-list lt-full" :style="{background:'url('+imgs.listBg+') no-repeat center top',backgroundSize:'cover'}">
-	// 					<ul>
-	// 						<li >
-	// 							<div @touchend='entry(item,i)' :class='{"show":listIndex >= i}' v-for='(item,i) in voiceList'>
-	// 								<img :src="item.img">
-	// 							</div>
-	// 						</li>
-	// 					</ul>
-	// 				</div>
-	// 			</transition>
-	//
-	//
-	// 		</div>
-	// 	</transition>
-	// </template>
-	//
-	// <script>
-	'use strict';
-
-	Object.defineProperty(exports, '__esModule', {
-		value: true
-	});
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-	__webpack_require__(28);
-
-	var _libAssetsJs = __webpack_require__(13);
-
-	var _jquery = __webpack_require__(15);
-
-	var _jquery2 = _interopRequireDefault(_jquery);
-
-	exports['default'] = {
-		props: ['obserable', 'pv', 'randomPv', 'nickname', 'headimgurl'],
-		name: 'zmitiindex',
-		data: function data() {
-			return {
-				imgs: _libAssetsJs.imgs,
-				showTeam: false,
-				showQrcode: false,
-				show: false,
-				viewW: window.innerWidth,
-				viewH: window.innerHeight,
-				voiceList: [],
-				isPlaying: false,
-				showMasks: false,
-				currentIndex: -1,
-				isPlaying: false,
-				lastCurrentIndex: -1,
-				isAutoPlay: false,
-				isReload: false,
-				showList: true,
-				iNow: -1,
-				scale: 1,
-				voiceStyle: {
-					bgStyle: {}
-				},
-
-				listIndex: -1
-
-			};
-		},
-		components: {},
-
-		methods: {
-
-			entryDetail: function entryDetail() {},
-
-			togglePlay: function togglePlay() {
-				this.isAutoPlay = !this.isAutoPlay;
-				if (!this.isPlaying) {
-					this.initLeft();
-				}
-			},
-
-			loadData: function loadData(url, fn) {
-				var _this = this;
-
-				var obserable = this.obserable;
-
-				_jquery2['default'].getJSON(url, function (data) {
-					//this.initGL(data)
-					_this.voiceList = data;
-
-					setTimeout(function () {
-						fn && fn();
-					}, 100);
-
-					return;
-					setTimeout(function () {
-						obserable.trigger({
-							type: 'showVoicePage'
-						});
-					}, 200);
-					//this.loadMusic(this.voiceList[0].audio,true);
-				});
-			},
-
-			entry: function entry(item, i) {
-				var scale = 0;
-
-				this.lastCurrentIndex = this.currentIndex;
-
-				/*switch(index){
-	   	case 0:
-	   	this.iNow = i;
-	   	break;
-	   	case 1:
-	   	this.iNow = i+this.list1.length;
-	   	break;
-	   	case 2:
-	   	this.iNow = i+this.list1.length+this.list2.length;
-	   	case 3:
-	   	this.iNow = i+this.list1.length+this.list2.length+this.list3.length;
-	   	case 4:
-	   	this.iNow = i+this.list1.length+this.list2.length+this.list3.length+this.list4.length;
-	   	case 5:
-	   	this.iNow = i+this.list1.length+this.list2.length+this.list3.length+this.list4.length+this.list5.length;
-	   	break;
-	   }*/
-
-				this.iNow = i;
-
-				this.showList = false;
-				this.listIndex = -1;
-
-				if (this.lastCurrentIndex <= this.iNow) {
-
-					if (!this.isLeftFirst) {
-						this.isLeftFirst = true;
-						scale = 1;
-					}
-
-					var len = this.iNow - this.lastCurrentIndex;
-					for (var k = 0; k < len; k++) {
-
-						//console.log(k)
-
-						this.initLeft();
-					}
-				} else {
-					if (!this.isRightFirst) {
-						this.isRightFirst = true;
-						scale = 1;
-					}
-					//console.log(this.lastCurrentIndex,this.iNow,this.lastCurrentIndex-this.iNow)
-					for (var a = 0; a < this.lastCurrentIndex - this.iNow; a++) {
-						//console.log(a);
-						this.initRight();
-					}
-				}
-
-				//this.lastCurrentIndex =this.currentIndex;
-			},
-
-			swipeLeft: function swipeLeft() {
-				var s = this;
-				this.isLeftFirst = true;
-				this.iNow = (s.currentIndex + 1) % s.voiceList.length;
-				this.initLeft();
-			},
-			swipeRight: function swipeRight() {
-				var s = this;
-				this.iNow = s.currentIndex - 1;
-				if (this.iNow < 0) {
-					this.iNow = this.voiceList.length - 1;
-				}
-				this.isRightFirst = true;
-				this.initRight();
-			},
-
-			initLeft: function initLeft() {
-				var s = this;
-
-				s.currentIndex = (s.currentIndex + 1) % s.voiceList.length;
-				//s.loadMusic(s.voiceList[s.currentIndex].audio);
-				//this.iNow = s.currentIndex;
-				var classList = ['left1 transition', 'left transition', 'active transition', 'right ', 'right1 '];
-				var voiceList = s.voiceList,
-				    currentIndex = s.currentIndex;
-
-				s.playAudio();
-
-				voiceList.forEach(function (list, i) {
-
-					if (currentIndex > i) {
-						voiceList[i].className = classList[0];
-					} else if (currentIndex < i) {
-						voiceList[i].className = classList[4];
-					}
-
-					(voiceList[currentIndex + 1] || voiceList[0])['className'] = classList[3];
-					(voiceList[currentIndex + 2] || voiceList[1])['className'] = classList[4];
-					(voiceList[currentIndex - 1] || voiceList[voiceList.length - 1])['className'] = classList[1];
-					//(voiceList[currentIndex - 2] || voiceList[voiceList.length - 2])['className'] = classList[0];
-				});
-
-				voiceList[currentIndex].className = classList[2];
-			},
-			initRight: function initRight() {
-				var s = this;
-				s.currentIndex = s.currentIndex - 1;
-
-				if (s.currentIndex < 0) {
-					s.currentIndex = s.voiceList.length - 1;
-				}
-				//this.iNow = s.currentIndex;
-				setTimeout(function () {
-					s.playAudio();
-				}, 10);
-				var voiceList = s.voiceList,
-				    currentIndex = s.currentIndex;
-
-				//console.log(s.currentIndex)
-
-				s.currentIndex = s.currentIndex % voiceList.length;
-
-				var classList = ['left1 ', 'left ', 'active transition', 'right transition', 'right1 transition'];
-
-				voiceList.forEach(function (list, i) {
-
-					if (currentIndex > i) {
-						voiceList[i].className = classList[0];
-					} else if (currentIndex < i) {
-						voiceList[i].className = classList[4];
-					}
-
-					(voiceList[currentIndex + 1] || voiceList[0])['className'] = classList[3];
-					(voiceList[currentIndex + 2] || voiceList[1])['className'] = classList[4];
-					(voiceList[currentIndex - 1] || voiceList[voiceList.length - 1])['className'] = classList[1];
-					//(voiceList[currentIndex - 2] || voiceList[voiceList.length - 2])['className'] = classList[0];
-				});
-
-				voiceList[currentIndex].className = classList[2];
-			},
-
-			loadMusic: function loadMusic(url) {
-				var isloaded = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
-
-				var zmitiRequestAnimationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame;
-				var ac = new (window.AudioContext || window.webkitAudioContext)();
-
-				var gainNode = ac[ac.createGain ? 'createGain' : 'createGianNode']();
-
-				gainNode.connect(ac.destination);
-
-				var analyser = ac.createAnalyser();
-				analyser.fftSize = 256;
-				analyser.connect(gainNode);
-
-				this.analyser = analyser;
-				var s = this;
-				var xhr = new XMLHttpRequest();
-				xhr.open('GET', url);
-				xhr.responseType = 'arraybuffer';
-				xhr.onload = function () {
-
-					ac.decodeAudioData(xhr.response, function (buffer) {
-						var bufferSource = ac.createBufferSource();
-						bufferSource.buffer = buffer;
-						bufferSource.connect(analyser);
-						//bufferSource.connect(ac.destination);
-						bufferSource[bufferSource.start ? 'start' : 'noteOn'](0);
-
-						var arr = new Uint8Array(analyser.frequencyBinCount);
-
-						var canvas = s.$refs['canvas'][s.currentIndex];
-
-						var context = canvas.getContext('2d');
-						context.fillStyle = '#8d3836';
-						//context.fillStyle ='#fff';
-
-						var canvasW = canvas.width,
-						    canvasH = canvas.height;
-
-						function render() {
-							analyser.getByteFrequencyData(arr);
-							//console.log(arr)
-							//console.log(arr)
-							context.clearRect(0, 0, canvasW, canvasH);
-							for (var i = 0; i < 30; i++) {
-								context.fillRect(12 * i, 0, 5, arr[i + 5] / 4);
-							}
-
-							zmitiRequestAnimationFrame(render);
-						}
-
-						isloaded && render();
-					});
-				};
-				xhr.send();
-			},
-
-			audioContextAction: function audioContextAction() {
-				var ac = new (window.AudioContext || window.webkitAudioContext)();
-
-				var bufferSource = ac.createBufferSource();
-			},
-
-			visualizer: function visualizer() {},
-
-			initGL: function initGL(data) {
-				var scene = new THREE.Scene();
-
-				scene.background = new THREE.Color(0xf0f0f0);
-
-				var renderer = new THREE.WebGLRenderer();
-				renderer.setSize(this.viewW, this.viewH);
-
-				this.$refs['page'].appendChild(renderer.domElement);
-
-				var camera = new THREE.PerspectiveCamera(45, this.viewW / this.viewH, 1, 1000);
-
-				camera.position.set(0, 0, 100);
-				camera.lookAt(scene.position);
-
-				var textureLoader = new THREE.TextureLoader();
-				var imgMap = textureLoader.load(this.imgs.floor);
-
-				imgMap.wrapS = THREE.RepeatWrapping;
-				imgMap.wrapT = THREE.RepeatWrapping;
-				imgMap.anisotropy = 4;
-
-				var imgMaterial = new THREE.MeshLambertMaterial({
-					map: imgMap
-				});
-				imgMaterial.needUpdate = true;
-
-				var imgPlaneGeo = new THREE.PlaneGeometry(100, 98, 1, 1);
-				var imgMesh = new THREE.Mesh(imgPlaneGeo, imgMaterial);
-				imgMesh.position.y = -20;
-				imgMesh.rotation.x = -Math.PI * 50 / 180;
-				//imgMesh.rotation.z = Math.PI*50/180;
-
-				scene.add(imgMesh);
-
-				var r = 30;
-
-				data.length = 10;
-				var angle = 360 / data.length;
-				data.forEach(function (item, i) {
-
-					var textureLoader = new THREE.TextureLoader();
-					var imgMap = textureLoader.load(item.img);
-					var imgMaterial = new THREE.MeshLambertMaterial({
-						map: imgMap
-					});
-
-					var imgPlaneGeo = new THREE.PlaneBufferGeometry(600 / 30, 838 / 30, 100);
-					var imgMesh = new THREE.Mesh(imgPlaneGeo, imgMaterial);
-					//imgMesh.position.z = Math.cos(angle/180*Math.PI*i)*r;
-					imgMesh.position.x = i * 30;
-
-					//imgMesh.rotation.y = (angle/180*Math.PI*i);
-
-					console.log(imgMesh.rotation);
-					scene.add(imgMesh);
-				});
-
-				scene.add(new THREE.AmbientLight('#fff', .7));
-
-				function animate() {
-
-					var time = Date.now() * 0.0005;
-
-					renderer.render(scene, camera);
-					requestAnimationFrame(animate);
-				}
-
-				animate();
-			},
-
-			reloadAudio: function reloadAudio() {
-				var _this2 = this;
-
-				this.isReload = true;
-				setTimeout(function () {
-					_this2.isReload = false;
-				}, 1000);
-				this.playAudio();
-			},
-			playAudio: function playAudio() {
-				var _this3 = this;
-
-				window.ss = this;
-				this.voiceList.forEach(function (voice, i) {
-					if (i !== _this3.currentIndex) {
-						_this3.$refs['audio'][i].muted = true;
-						_this3.$refs['audio'][i].currentTime = 0;
-
-						//!this.$refs['audio'][i].paused&&this.$refs['audio'][i].pause();
-					}
-				});
-				var audio = this.$refs['audio'][this.currentIndex];
-				if (audio) {
-					audio.muted = false;
-					audio.currentTime = 0;
-					audio.play();
-				}
-			},
-			showVoiceList: function showVoiceList() {
-				var obserable = this.obserable;
-
-				obserable.trigger({ type: 'initList' });
-			},
-			entryIndex: function entryIndex() {
-				//回到主通道
-				this.show = false;
-				this.showVoiceList();
-				this.voiceList.length = 0;
-			}
-		},
-		mounted: function mounted() {
-			var _this4 = this;
-
-			var obserable = this.obserable;
-
-			obserable.on('showVoicePage', function (data) {
-				_this4.show = true;
-				_this4.currentIndex = 0;
-
-				data && data.url && _this4.loadData(data.url, function () {
-					obserable.trigger({
-						type: 'initList'
-					});
-
-					_this4.voiceList.forEach(function (voice, i) {
-						var $voice = (0, _jquery2['default'])(_this4.$refs['audio'][i]);
-						$voice.off('play').on('play', function () {
-							_this4.isPlaying = true;
-						});
-						$voice.off('pause').on('pause', function () {
-							//this.isPlaying = false;
-						});
-						$voice.off('ended').on('ended', function () {
-							if (!_this4.$refs['audio'][i].muted) {
-								_this4.isPlaying = false;
-								if (_this4.isAutoPlay) {
-									_this4.initLeft();
-								}
-							}
-						});
-
-						_this4.$refs['audio'][i].currentTime = 0;
-						_this4.$refs['audio'][i].muted = true;
-						_this4.$refs['audio'][i].play();
-					});
-				});
-
-				if (data) {
-					if (data.voiceStyle) {
-						_this4.voiceStyle = data.voiceStyle;
-					}
-				}
-
-				/*setTimeout(()=>{
-	   	this.$refs['audio'][0].currentTime = 0;
-	   	this.$refs['audio'][0].muted =false;
-	   	this.$refs['audio'][0].play();
-	   	//this.playAudio();
-	   },10)*/
-			});
-
-			obserable.on('initList', function () {
-				_this4.showList = true;
-				var i = -1;
-				var t = setInterval(function () {
-					i++;
-					_this4.listIndex = i;
-					if (i > _this4.voiceList.length) {
-						clearInterval(t);
-					}
-				}, 60);
-			});
-		}
-	};
-
-	// </script>
-	module.exports = exports['default'];
-
-/***/ }),
-/* 28 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	// style-loader: Adds some css to the DOM by adding a <style> tag
-
-	// load the styles
-	var content = __webpack_require__(29);
-	if(typeof content === 'string') content = [[module.id, content, '']];
-	// add the styles to the DOM
-	var update = __webpack_require__(8)(content, {});
-	if(content.locals) module.exports = content.locals;
-	// Hot Module Replacement
-	if(false) {
-		// When the styles change, update the <style> tags
-		if(!content.locals) {
-			module.hot.accept("!!../../node_modules/css-loader/index.js!./index.css", function() {
-				var newContent = require("!!../../node_modules/css-loader/index.js!./index.css");
-				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-				update(newContent);
-			});
-		}
-		// When the module is disposed, remove the <style> tags
-		module.hot.dispose(function() { update(); });
-	}
-
-/***/ }),
-/* 29 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	exports = module.exports = __webpack_require__(7)();
-	// imports
-
-
-	// module
-	exports.push([module.id, ".lt-full{width:100%;height:100%;position:absolute;left:0;top:0}.zmiti-text-overflow{overflow:hidden;white-space:nowrap;word-break:break-all;text-overflow:ellipsis;-webkit-text-overflow:ellipsis}.zmiti-play{width:.8rem;height:.8rem;border-radius:50%;position:fixed;z-index:1000;right:.5rem;top:.5rem}.zmiti-play.rotate{-webkit-animation:rotate 5s linear infinite;animation:rotate 5s linear infinite}@-webkit-keyframes rotate{to{-webkit-transform:rotate(360deg);transform:rotate(360deg)}}.zmiti-tree-main-ui{overflow:hidden;width:10rem;background:#fcfff8;z-index:110;opacity:1;-webkit-transform-style:preserve-3d;transform-style:preserve-3d;perspective:800px;-webkit-perspective:800px}.zmiti-tree-main-ui.main-enter-active,.zmiti-tree-main-ui.main-leave-active{-webkit-transition:.5s;transition:.5s}.zmiti-tree-main-ui.main-enter,.zmiti-tree-main-ui.main-leave-to{opacity:0}.zmiti-tree-main-ui .zmiti-btn{position:absolute;width:2.4rem;height:.8rem;background:#fff;line-height:.8rem;text-align:center;color:#ae5553;right:.4rem;bottom:.4rem;border-radius:10px}.zmiti-tree-main-ui .zmiti-main{left:3.8rem}.zmiti-tree-main-ui .zmiti-team{right:auto;left:.4rem}.zmiti-tree-main-ui .zmiti-list{left:50%;-webkit-transform:translate3d(-50%, 0, 0);transform:translate3d(-50%, 0, 0)}.zmiti-tree-main-ui ul.zmiti-subject-list{width:7rem;left:1.5rem;top:18vh;position:absolute;height:65vh;z-index:1}.zmiti-tree-main-ui ul.zmiti-subject-list:before{content:'';position:absolute;width:1125px;height:50%;left:50%;margin-left:-562.5px;bottom:-3rem;background:#fefddf;border-radius:50%;z-index:0;display:none}.zmiti-tree-main-ui ul.zmiti-subject-list li{background:#fff;border:5px solid #e6cda4;box-sizing:border-box;display:-webkit-box;-webkit-box-align:center;-webkit-box-pack:center;-webkit-box-orient:vertical}.zmiti-tree-main-ui ul.zmiti-subject-list li .zmiti-voice-title{height:1rem;width:100%;position:absolute;left:0;top:0}.zmiti-tree-main-ui ul.zmiti-subject-list li .zmiti-voice-title img{height:.5rem;width:auto;margin-top:.05rem}.zmiti-tree-main-ui ul.zmiti-subject-list li .zmiti-voice-title span{color:#8d3836;background:#f3eece;border-radius:4px;font-size:.36rem;padding:8px}.zmiti-tree-main-ui ul.zmiti-subject-list li .zmiti-voice-title span:nth-of-type(2){position:absolute;font-size:.45rem;right:0;top:0}.zmiti-tree-main-ui ul.zmiti-subject-list li .zmiti-voice-name{color:#8d3836;text-align:center;font-size:.45rem;margin:.15rem auto;width:100%;width:4.0rem;position:relative}.zmiti-tree-main-ui ul.zmiti-subject-list li .zmiti-voice-name:before{position:absolute;content:'';bottom:5px;left:0;width:100%;height:2px;display:none;background:-webkit-gradient(linear, left top, right top, from(rgba(225,225,2,0.2)), color-stop(0.5, #e1e102), to(rgba(225,225,2,0.2)));background:-moz-linear-gradient(left, rgba(225,225,2,0.2), #e1e102 50%, rgba(225,225,2,0.2));background:-ms-linear-gradient(left, rgba(225,225,2,0.2), #e1e102 50%, rgba(225,225,2,0.2))}.zmiti-tree-main-ui ul.zmiti-subject-list li .zmiti-ar{position:absolute;bottom:0rem;left:.2rem;height:.7rem;width:1rem}.zmiti-tree-main-ui ul.zmiti-subject-list li .zmiti-ar>div{position:absolute;width:1rem;height:3px;background:#8d3836;bottom:.2rem}.zmiti-tree-main-ui ul.zmiti-subject-list li .zmiti-ar>div:before{content:'';position:absolute;width:.3rem;height:3px;-webkit-transform:rotate(-45deg);transform:rotate(-45deg);-webkit-transform-origin:left;transform-origin:left;left:0;top:0;background:#8d3836}.zmiti-tree-main-ui ul.zmiti-subject-list li .zmiti-ar.zmiti-ar1{-webkit-transform:rotateY(180deg);transform:rotateY(180deg);right:.2rem;left:auto}.zmiti-tree-main-ui ul.zmiti-subject-list li .zmiti-operator{display:-webkit-box;-webkit-box-align:center;-webkit-box-pack:center;-webkit-box-orient:horizontal;z-index:10012;width:80%;left:10%;height:80px;top:auto;background:#ae5553;text-align:center}.zmiti-tree-main-ui ul.zmiti-subject-list li .zmiti-operator canvas{display:block;border:none;border-right:1px solid #8d3836}.zmiti-tree-main-ui ul.zmiti-subject-list li .zmiti-operator section{text-align:center;width:.8rem;height:100%;-webkit-box-flex:1;line-height:80px}.zmiti-tree-main-ui ul.zmiti-subject-list li .zmiti-operator section:nth-of-type(2) img.rotate{-webkit-animation:rotate 1s linear;animation:rotate 1s linear}.zmiti-tree-main-ui ul.zmiti-subject-list li .zmiti-operator section img{width:.6rem}.zmiti-tree-main-ui ul.zmiti-subject-list li canvas{left:112px}.zmiti-tree-main-ui ul.zmiti-subject-list li.zmiti-page-item{-webkit-transition:-webkit-transform .4s;transition:transform .4s}.zmiti-tree-main-ui ul.zmiti-subject-list li .zmiti-img-C{position:relative;width:4.0rem;-webkit-transform-style:preserve-3d;transform-style:preserve-3d;perspective:800px;-webkit-perspective:800px}.zmiti-tree-main-ui ul.zmiti-subject-list li .zmiti-img-C:after{content:'';width:100%;height:.6rem;border-radius:50%;position:absolute;left:0;bottom:-1.5rem}.zmiti-tree-main-ui ul.zmiti-subject-list li .zmiti-img-C:before{content:'';position:absolute;width:100%;height:100%;left:0;top:0;box-shadow:0 0 0 8px #ae5553}.zmiti-tree-main-ui ul.zmiti-subject-list li.left{opacity:1;-webkit-transform:translate3d(-5.66667rem, 0, 0) rotateY(90deg);transform:translate3d(-5.66667rem, 0, 0) rotateY(90deg)}.zmiti-tree-main-ui ul.zmiti-subject-list li.transition{-webkit-transition:-webkit-transform .4s;transition:transform .4s}.zmiti-tree-main-ui ul.zmiti-subject-list li.left1{opacity:0;-webkit-transform:translate3d(-750px, 0, 0) rotateY(90deg);transform:translate3d(-750px, 0, 0) rotateY(90deg)}.zmiti-tree-main-ui ul.zmiti-subject-list li.right{opacity:1;-webkit-transform:translate3d(5.66667rem, 0, 0) rotateY(-90deg);transform:translate3d(5.66667rem, 0, 0) rotateY(-90deg)}.zmiti-tree-main-ui ul.zmiti-subject-list li.right1{opacity:0;-webkit-transform:translate3d(750px, 0, 0) rotateY(-90deg);transform:translate3d(750px, 0, 0) rotateY(-90deg)}.zmiti-tree-main-ui ul.zmiti-subject-list li.active{-webkit-transform:rotateY(0);transform:rotateY(0);z-index:100}.zmiti-team-main-ui{z-index:1010;background:#fcfff8;display:-webkit-box;-webkit-box-align:center;-webkit-box-pack:center;-webkit-box-orient:vertical;color:#6b5419;opacity:1}.zmiti-team-main-ui.team-enter-active,.zmiti-team-main-ui.team-leave-active{-webkit-transition:.5s;transition:.5s}.zmiti-team-main-ui.team-enter,.zmiti-team-main-ui.team-leave-to{opacity:0}.zmiti-team-main-ui .zmiti-team-main{color:#880d07;margin-top:1rem}.zmiti-team-main-ui .zmiti-team-main>h1{display:-webkit-box;-webkit-box-align:center;-webkit-box-pack:center;-webkit-box-orient:horizontal;width:9.7rem;font-weight:normal;font-size:.6rem;height:2rem}.zmiti-team-main-ui .zmiti-team-main>h1>div:nth-of-type(1),.zmiti-team-main-ui .zmiti-team-main>h1>div:nth-of-type(3){margin-top:40px}.zmiti-team-main-ui .zmiti-team-main>section{font-size:.4rem;width:8rem;margin:0 auto;height:1rem;line-height:1rem}.zmiti-team-main-ui .zmiti-team-main>section.zmiti-copyright{position:relative;line-height:1.6rem}.zmiti-team-main-ui .zmiti-team-main>section.zmiti-copyright:before{content:'';position:absolute;width:100%;height:1px;background:rgba(0,0,0,0.2);left:0;top:0}.zmiti-team-main-ui .zmiti-team-main>section span{padding:0 10px}.zmiti-team-main-ui .zmiti-team-main .zmiti-back{background:#ebdfb5;width:2rem;height:.7rem;line-height:.7rem;text-align:center;border-radius:8px;margin:.5rem auto;font-size:.4rem;box-shadow:0 4px 4px rgba(0,0,0,0.5)}.zmiti-voice-list{z-index:1000;margin:0vh auto 0;display:-webkit-box;-webkit-box-align:center;-webkit-box-pack:center;-webkit-box-orient:vertical}.zmiti-voice-list.list-enter-active,.zmiti-voice-list.list-leave-active{-webkit-transition:.5s;transition:.5s}.zmiti-voice-list.list-enter,.zmiti-voice-list.list-leave-to{opacity:0}.zmiti-voice-list ul{position:relative;width:9.8rem;left:.1rem}.zmiti-voice-list ul:after{content:'\\70B9\\51FB\\56FE\\7247\\6536\\542C';position:absolute;left:50%;top:100%;width:3rem;line-height:.7rem;height:.7rem;background:#fff;font-size:.4rem;-webkit-transform:translate3d(-50%, 0, 0) scale(0.7);transform:translate3d(-50%, 0, 0) scale(0.7);color:#8d3836;text-align:center}.zmiti-voice-list li{box-sizing:border-box;display:-webkit-box;-webkit-box-align:center;-webkit-box-pack:center;-webkit-box-orient:horizontal}.zmiti-voice-list li div{display:inline-block;width:1.2rem;box-shadow:3px 3px 3px rgba(0,0,0,0.44);opacity:.3}.zmiti-voice-list li div.show{opacity:1;-webkit-transition:0.2s opacity;transition:0.2s opacity}.zmiti-voice-list li div{margin-right:20px;margin-top:20px;border:1px solid #fff;box-sizing:border-box}.zmiti-voice-list li div:last-of-type{margin-right:0}.zmiti-voice-list li:last-of-type{margin:.1rem 0;text-align:center}.zmiti-voice-list li:last-of-type div{margin:.2rem .3rem .2rem 0}.zmiti-voice-list li:last-of-type div:nth-of-type(6n){margin-right:0}\r\n/*# sourceMappingURL=index.css.map */\r\n", ""]);
-
-	// exports
-
-
-/***/ }),
-/* 30 */
-/***/ (function(module, exports) {
-
-	module.exports = "\n\t<transition name='main'>\n\t\t<div  class=\"lt-full zmiti-tree-main-ui \" :style=\"voiceStyle.bgStyle\"  v-show='show' ref='page'>\n\t\t\t<ul v-swipeleft='swipeLeft' v-swiperight='swipeRight' class=\"zmiti-subject-list\"  id=\"zmiti-subject-list\" >\n\t\t\t\t\t<li :class=\"voice.className\" :style=\"{background:'#fff url('+imgs.imgBg+') no-repeat center top',backgroundSize:'cover'}\"\n\t\t\t\t\tclass=\"lt-full\" v-for='(voice,index) in voiceList' @click='entryDetail(voice)' >\n\t\t\t\t\t\t<div class=\"zmiti-voice-title\">\n\t\t\t\t\t\t\t<span hidden=\"\">通道好声音</span>\n\t\t\t\t\t\t\t<img :src=\"voiceStyle.titleImg\">\n\t\t\t\t\t\t\t<span hidden=\"\">{{index+1}}</span>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div class=\"zmiti-img-C\" @touchend='playAudio'>\n\t\t\t\t\t\t\t<img draggable='false' v-bind:src='voice.img'/>\n\t\t\t\t\t\t</div>\n\n\t\t\t\t\t\t<div class=\"zmiti-voice-name\">\n\t\t\t\t\t\t\t{{voice.name}}\n\t\t\t\t\t\t</div>\n\n\n\t\t\t\t\t\t<audio :src='voice.audio' ref='audio'></audio>\n\n\t\t\t\t\t\t<div class=\"zmiti-operator\">\n\t\t\t\t\t\t\t<section class=\"zmiti-start\">\n\t\t\t\t\t\t\t\t<img :src=\"imgs.voice\" />\n\t\t\t\t\t\t\t</section>\n\t\t\t\t\t\t\t<canvas :style=\"{background:'url('+(index === currentIndex && isPlaying ?imgs.frequency:imgs.frequency1)+') no-repeat center center',backgroundSize:'contain'}\" :id='voice.id' ref='canvas' width=\"260\" height=\"70\"></canvas>\n\t\t\t\t\t\t\t<section class=\"zmiti-reload\" @touchend='reloadAudio'>\n\t\t\t\t\t\t\t\t<img :src=\"imgs.reload\" :class='{\"rotate\":isReload && currentIndex === index}' />\n\t\t\t\t\t\t\t</section>\n\t\t\t\t\t\t</div>\n\n\t\t\t\t\t\t<div class=\"zmiti-ar\" @touchend='initRight'>\n\t\t\t\t\t\t\t<div></div>\n\t\t\t\t\t\t</div>\n\n\t\t\t\t\t\t<div class=\"zmiti-ar zmiti-ar1\" @touchend='initLeft'>\n\t\t\t\t\t\t\t<div></div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\n\t\t\t\t\t</li>\n\t\t\t\t</ul>\n\n\t\t\t<div class=\"zmiti-team zmiti-btn\" @touchend='showTeam = true'>\n\t\t\t\t制作团队\n\t\t\t</div>\n\t\t\t\n\t\t\t<div  class=\" zmiti-main zmiti-btn\" @touchend='entryIndex'>\n\t\t\t\t主通道\n\t\t\t</div>\n\n\t\t\t<div  class=\" zmiti-listen zmiti-btn\" @touchend='showVoiceList'>\n\t\t\t\t返回\n\t\t\t</div>\n\n\t\t\t<div  hidden=\"\" class=\"zmiti-listen zmiti-btn\" @touchend='togglePlay'>\n\t\t\t\t{{isAutoPlay?'暂停':'依次收听'}}\n\t\t\t</div>\n\n\t\t\t<transition name='team'>\n\t\t\t\t<div v-if='showTeam' :style='{background:\"#fff url(\"+imgs.teamBg+\") no-repeat center top\",backgroundSize:\"cover\"}' class=\"zmiti-team-main-ui lt-full\" @touchend='showTeam = false'>\n\t\t\t\t\t<div class=\"zmiti-team-main\">\n\t\t\t\t\t\t<h1>\n\t\t\t\t\t\t\t<div>制作团队</div>\n\t\t\t\t\t\t</h1>\n\t\t\t\t\t\t<section><span>总策划：</span><span>刘思扬</span></section>\n\t\t\t\t\t\t<section><span>总监制：</span><span>刘洁</span><span>陈凯星</span><span>冯瑛冰</span></section>\n\t\t\t\t\t\t<section><span>统筹：</span><span>兰红光</span><span>马书平</span></section>\n\t\t\t\t\t\t<section><span>监制：</span><span>葛素表</span><span>陈知春</span><span>曹建礼</span><span>李代祥</span></section>\t\n\t\t\t\t\t\t<section><span>设计：</span><span>赵丹阳</span></section>\n\t\t\t\t\t\t<section><span>记者：</span><span>李尕</span><span>路滨琪</span><span>潘旭</span><span>赖星</span><span>孔令杭</span></section>\n\t\t\t\t\t\t<section><span>技术支持：</span><span>雷风侠工作室</span></section>\n\t\t\t\t\t\t<section  style=\"margin-top: 30px\" class=\"zmiti-copyright\"><span>新华社新媒体中心、摄影部联合出品</span></section>\n\n\t\t\t\t\t\t\t\n\t\t\t\t\t\t<div class=\"zmiti-back\">返回</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</transition>\n\n\t\t\t<transition name='list'>\n\t\t\t\t<div v-if='showList' class=\"zmiti-voice-list lt-full\" :style=\"{background:'url('+imgs.listBg+') no-repeat center top',backgroundSize:'cover'}\">\n\t\t\t\t\t<ul>\n\t\t\t\t\t\t<li >\n\t\t\t\t\t\t\t<div @touchend='entry(item,i)' :class='{\"show\":listIndex >= i}' v-for='(item,i) in voiceList'>\n\t\t\t\t\t\t\t\t<img :src=\"item.img\">\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</li>\n\t\t\t\t\t</ul>\n\t\t\t\t</div>\n\t\t\t</transition>\n\n\t\t\t\n\t\t</div>\n\t</transition>\n";
-
-/***/ }),
-/* 31 */
-/***/ (function(module, exports) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	var Obserable = (function () {
-		function Obserable() {
-			_classCallCheck(this, Obserable);
-
-			this.handlers = {};
-		}
-
-		_createClass(Obserable, [{
-			key: "on",
-			value: function on(type, handler) {
-
-				this.handlers[type] = this.handlers[type] || [];
-
-				this.off(type);
-				this.handlers[type].push({ handler: handler, type: type });
-			}
-		}, {
-			key: "off",
-			value: function off(type) {
-				var _this = this;
-
-				this.handlers[type] && this.handlers[type].forEach(function (item, i) {
-					if (item.type === type) {
-						_this.handlers[type].splice(i, 1);
-					};
-				});
-			}
-		}, {
-			key: "trigger",
-			value: function trigger(event) {
-
-				if (!event.target) {
-					event.target = this;
-				}
-
-				if (this.handlers[event.type] instanceof Array) {
-					var handlers = this.handlers[event.type]; //检出被观察者注册的观察者
-					for (var i = 0, len = handlers.length; i < len; i++) {
-						return handlers[i].handler(event.data); //回调函数执行，也就是观察者更新自己
-					}
-				}
-			}
-		}]);
-
-		return Obserable;
-	})();
-
-	exports["default"] = Obserable;
-	module.exports = exports["default"];
-
-/***/ }),
-/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";

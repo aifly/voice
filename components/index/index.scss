@@ -14,16 +14,25 @@ $bgColor: #fcfff8;
 		@include pos(a);
 		z-index: 10;
 		width: 100%;
-		top: 50%;
-		@include displayBox(horizontal);		
-		.zmiti-wyBtn,.zmiti-bzBtn {
-			margin: 0 30px;
-			width: 3rem;
+		height: 100%;
+		
+		//@include displayBox(horizontal);		
+		.zmiti-wyBtn,.zmiti-bzBtn,.zmiti-dbBtn {
+			@include pos(a);
+			width:1.4rem;
+			left: 0;
+			top: 60%;
 			@include animation(scale .7s infinite linear alternate);
 		}
-		.zmiti-bzBtn{
-			@include animation(scale .7s .4s infinite linear alternate);
 
+		.zmiti-bzBtn{
+			left: 4.4rem;
+			top: 72%;
+			@include animation(scale .7s .4s infinite linear alternate);
+		}
+		.zmiti-wyBtn{
+			right: 0;
+			left: auto;
 		}
 	}
 

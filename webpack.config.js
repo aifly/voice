@@ -52,9 +52,6 @@ var config = {
             test: /\.(eot|svg|ttf|woff|woff2|png)\w*/,
             loader: 'file'
         }]
-    },
-    babel: {
-
     }
 
 }

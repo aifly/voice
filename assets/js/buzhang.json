@@ -1,5 +1,4 @@
 [
-
 	{
 		"id": "1",
 		"img": "./assets/images/buzhang/1.jpg",
@@ -137,6 +136,48 @@
 		"img": "./assets/images/buzhang/23.jpg",
 		"name": "国务院扶贫办主任刘永富",
 		"audio": "./assets/music/buzhang/23.mp3",
+		"className": "left"
+	},{
+		"id": "24",
+		"img": "./assets/images/24.jpg",
+		"name": "国家邮政局局长马军胜",
+		"audio": "./assets/music/24.mp3",
+		"className": "active transition"
+	}, {
+		"id": "25",
+		"img": "./assets/images/25.jpg",
+		"name": "国家体育总局局长苟仲文",
+		"audio": "./assets/music/25.mp3",
+		"className": "right"
+	}, {
+		"id": "26",
+		"img": "./assets/images/26.jpg",
+		"name": "中国残疾人联合会执行理事会理事长鲁勇",
+		"audio": "./assets/music/26.mp3",
+		"className": "right"
+	}, {
+		"id": "27",
+		"img": "./assets/images/27.jpg",
+		"name": "生态环境部部长李干杰",
+		"audio": "./assets/music/27.mp3",
+		"className": "right"
+	}, {
+		"id": "28",
+		"img": "./assets/images/28.jpg",
+		"name": "住房和城乡建设部部长王蒙徽",
+		"audio": "./assets/music/28.mp3",
+		"className": "right"
+	}, {
+		"id": "29",
+		"img": "./assets/images/29.jpg",
+		"name": "审计署审计长胡泽君",
+		"audio": "./assets/music/29.mp3",
+		"className": "right"
+	}, {
+		"id": "30",
+		"img": "./assets/images/30.jpg",
+		"name": "科学技术部部长王志刚",
+		"audio": "./assets/music/30.mp3",
 		"className": "left"
 	}
 ]

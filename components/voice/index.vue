@@ -152,6 +152,7 @@
 					//this.initGL(data)
 					this.voiceList = data;
 
+
 					setTimeout(()=>{
 						fn&& fn();
 					},100)
@@ -525,6 +526,8 @@
 			obserable.on('showVoicePage',(data)=>{
 				this.show = true;
 				this.currentIndex = 0;
+
+
 
 				data && data.url && this.loadData(data.url,()=>{
 					obserable.trigger({
