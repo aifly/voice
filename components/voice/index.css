@@ -216,8 +216,11 @@
           z-index: 10;
           color: #fef9ea;
           font-size: .3rem;
-          padding: .15rem;
-          border-top-right-radius: 18px; }
+          padding: .1rem 0;
+          width: 100%;
+          font-size: 20px;
+          text-align: center;
+          letter-spacing: 2px; }
         .zmiti-tree-main-ui ul.zmiti-subject-list li .zmiti-img-C:after {
           content: '';
           width: 100%;
