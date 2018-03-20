@@ -123,9 +123,8 @@
         font-size: .4rem;
         /* height: 1rem;
         line-height: 1rem; */
-        margin: .15rem auto;
+        margin: .2rem auto;
         width: 100%;
-        width: 4.4rem;
         position: relative; }
         .zmiti-tree-main-ui ul.zmiti-subject-list li .zmiti-voice-name:before {
           position: absolute;
@@ -293,8 +292,7 @@
       font-size: .4rem;
       width: 8rem;
       margin: 0 auto;
-      height: 1rem;
-      line-height: 1rem; }
+      line-height: .7rem; }
       .zmiti-team-main-ui .zmiti-team-main > section.zmiti-copyright {
         position: relative;
         line-height: 1.6rem; }

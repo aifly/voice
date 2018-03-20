@@ -67,9 +67,10 @@
 						<section><span>总策划：</span><span>刘思扬</span></section>
 						<section><span>总监制：</span><span>刘洁</span><span>陈凯星</span><span>冯瑛冰</span></section>
 						<section><span>统筹：</span><span>兰红光</span><span>马书平</span></section>
-						<section><span>监制：</span><span>葛素表</span><span>陈知春</span><span>曹建礼</span><span>李代祥</span></section>	
+						<section><span>监制：</span><span>葛素表</span><span>陈知春</span><span>于卫亚</span><span>曹建礼</span><span  style="opacity:0">曹建建礼</span><span>李代祥</span><span>周年钧</span><span>何莉</span></section>	
 						<section><span>设计：</span><span>赵丹阳</span></section>
 						<section><span>记者：</span><span>李尕</span><span>路滨琪</span><span>潘旭</span><span>赖星</span><span>孔令杭</span></section>
+						<section><span>编辑：</span><span>王绥翊</span><span>姜子炜</span><span>叶心可</span><span>黄南希</span><span style="opacity:0;">徐徐祥达</span><span>徐祥达</span></section>
 						<section><span>技术支持：</span><span>雷风侠工作室</span></section>
 						<section  style="margin-top: 30px" class="zmiti-copyright"><span>新华社新媒体中心、摄影部联合出品</span></section>
 

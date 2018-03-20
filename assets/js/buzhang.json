@@ -73,21 +73,21 @@
 	}, {
 		"id": "11",
 		"img": "./assets/images/buzhang/11.jpg",
-		"name": "国务院台湾事务办公室主任张志军",
+		"name": "国务院台湾事务办公室主任<br/>张志军",
 		"audio": "./assets/music/buzhang/11.mp3",
 		"className": "right",
 		"date":"3月5日部长通道"
 	}, {
 		"id": "12",
 		"img": "./assets/images/buzhang/12.jpg",
-		"name": "国家发展和改革委员会主任何立峰",
+		"name": "国家发展和改革委员会主任<br/>何立峰",
 		"audio": "./assets/music/buzhang/12.mp3",
 		"className": "right",
 		"date":"3月9日部长通道"
 	}, {
 		"id": "13",
 		"img": "./assets/images/buzhang/13.jpg",
-		"name": "国家卫生和计划生育委员会主任李斌",
+		"name": "国家卫生和计划生育委员会主任<br/>李斌",
 		"audio": "./assets/music/buzhang/13.mp3",
 		"className": "right",
 		"date":"3月9日部长通道"
@@ -101,21 +101,21 @@
 	}, {
 		"id": "15",
 		"img": "./assets/images/buzhang/15.jpg",
-		"name": "国家工商行政管理总局局长张茅",
+		"name": "国家工商行政管理总局局长<br/>张茅",
 		"audio": "./assets/music/buzhang/15.mp3",
 		"className": "right",
 		"date":"3月9日部长通道"
 	}, {
 		"id": "16",
 		"img": "./assets/images/buzhang/16.jpg",
-		"name": "中国银行业监督管理委员会主席郭树清",
+		"name": "中国银行业监督管理委员会主席<br/>郭树清",
 		"audio": "./assets/music/buzhang/16.mp3",
 		"className": "right",
 		"date":"3月9日部长通道"
 	}, {
 		"id": "17",
 		"img": "./assets/images/buzhang/17.jpg",
-		"name": "国务院港澳事务办公室主任张晓明",
+		"name": "国务院港澳事务办公室主任<br/>张晓明",
 		"audio": "./assets/music/buzhang/17.mp3",
 		"className": "right",
 		"date":"3月9日部长通道"
@@ -178,7 +178,7 @@
 	}, {
 		"id": "26",
 		"img": "./assets/images/buzhang/26.jpg",
-		"name": "中国残疾人联合会执行理事会理事长鲁勇",
+		"name": "中国残疾人联合会执行理事会理事长<br/>鲁勇",
 		"audio": "./assets/music/buzhang/26.mp3",
 		"className": "right",
 		"date":"3月19日部长通道"
