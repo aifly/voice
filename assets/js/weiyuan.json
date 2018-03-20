@@ -19,18 +19,18 @@
 		"audio": "./assets/music/3.mp3",
 		"className": "right"
 	}, {
-		"id": "4",
-		"img": "./assets/images/4.jpg",
-		"name": "周晔委员",
-		"audio": "./assets/music/4.mp3",
-		"className": "right"
-	}, {
 		"id": "5",
 		"img": "./assets/images/5.jpg",
 		"name": "吴浩委员",
 		"audio": "./assets/music/5.mp3",
 		"className": "right"
-	}, {
+	},{
+		"id": "4",
+		"img": "./assets/images/4.jpg",
+		"name": "周晔委员",
+		"audio": "./assets/music/4.mp3",
+		"className": "right"
+	},{
 		"id": "6",
 		"img": "./assets/images/6-1.jpg",
 		"name": "张敏委员",

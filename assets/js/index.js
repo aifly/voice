@@ -58,29 +58,29 @@
 
 	var _componentsIndexIndex2 = _interopRequireDefault(_componentsIndexIndex);
 
-	var _componentsMusicIndex = __webpack_require__(12);
+	var _componentsMusicIndex = __webpack_require__(22);
 
 	var _componentsMusicIndex2 = _interopRequireDefault(_componentsMusicIndex);
 
-	var _componentsVoiceIndex = __webpack_require__(15);
+	var _componentsVoiceIndex = __webpack_require__(25);
 
 	var _componentsVoiceIndex2 = _interopRequireDefault(_componentsVoiceIndex);
 
-	var _componentsLibObserable = __webpack_require__(18);
+	var _componentsLibObserable = __webpack_require__(30);
 
 	var _componentsLibObserable2 = _interopRequireDefault(_componentsLibObserable);
 
-	var _componentsLibAssets = __webpack_require__(19);
+	var _componentsLibAssets = __webpack_require__(13);
 
-	var _componentsLibUtilJs = __webpack_require__(20);
+	var _componentsLibUtilJs = __webpack_require__(14);
 
 	var _componentsLibUtilJs2 = _interopRequireDefault(_componentsLibUtilJs);
 
-	var _jquery = __webpack_require__(21);
+	var _jquery = __webpack_require__(15);
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
-	__webpack_require__(22);
+	__webpack_require__(31);
 
 	var obserable = new _componentsLibObserable2['default']();
 
@@ -11961,8 +11961,8 @@
 /***/ (function(module, exports, __webpack_require__) {
 
 	var __vue_script__, __vue_template__
-	__vue_script__ = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"-!babel-loader?presets[]=es2015&plugins[]=transform-runtime!../../node_modules/vue-loader/lib/selector.js?type=script&index=0!./index.vue\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()))
-	__vue_template__ = __webpack_require__(11)
+	__vue_script__ = __webpack_require__(10)
+	__vue_template__ = __webpack_require__(21)
 	module.exports = __vue_script__ || {}
 	if (module.exports.__esModule) module.exports = module.exports.default
 	if (__vue_template__) { (typeof module.exports === "function" ? module.exports.options : module.exports).template = __vue_template__ }
@@ -11979,136 +11979,168 @@
 	})()}
 
 /***/ }),
-/* 10 */,
-/* 11 */
-/***/ (function(module, exports) {
+/* 10 */
+/***/ (function(module, exports, __webpack_require__) {
 
-	module.exports = "\r\n\t<div  class=\"lt-full zmiti-index-main-ui \" :style=\"{background: 'url('+imgs.index+') no-repeat center center',backgroundSize:'cover'}\"  :class=\"{'show':show}\">\r\n\t\t\r\n\t\t<div class=\"zmiti-btn-group\">\r\n\t\t\t<div class=\"zmiti-dbBtn\" @touchend='entry(2)' >\r\n\t\t\t\t<img :src=\"imgs.dbBtn\" />\r\n\t\t\t</div>\r\n\t\t\t<div class=\"zmiti-bzBtn\" @touchend='entry(1)' >\r\n\t\t\t\t<img :src=\"imgs.bzBtn\" />\r\n\t\t\t</div>\r\n\t\t\t<div class=\"zmiti-wyBtn\" @touchend='entry(0)' >\r\n\t\t\t\t<img :src=\"imgs.wyBtn\" />\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t\t\r\n\t</div>\r\n";
+	// <template>
+	// 	<div  class="lt-full zmiti-index-main-ui " :style="{background: 'url('+imgs.index+') no-repeat center center',backgroundSize:'cover'}"  :class="{'show':show}">
+	//
+	// 		<div class="zmiti-btn-group">
+	// 			<div class="zmiti-dbBtn" @touchend='entry(2)' >
+	// 				<img :src="imgs.dbBtn" />
+	// 			</div>
+	// 			<div class="zmiti-bzBtn" @touchend='entry(1)' >
+	// 				<img :src="imgs.bzBtn" />
+	// 			</div>
+	// 			<div class="zmiti-wyBtn" @touchend='entry(0)' >
+	// 				<img :src="imgs.wyBtn" />
+	// 			</div>
+	// 		</div>
+	//
+	// 	</div>
+	// </template>
+	//
+	// <script>
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+		value: true
+	});
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	__webpack_require__(11);
+
+	var _libAssetsJs = __webpack_require__(13);
+
+	var _libUtil = __webpack_require__(14);
+
+	var _libUtil2 = _interopRequireDefault(_libUtil);
+
+	var _jquery = __webpack_require__(15);
+
+	var _jquery2 = _interopRequireDefault(_jquery);
+
+	var _toastToast = __webpack_require__(16);
+
+	var _toastToast2 = _interopRequireDefault(_toastToast);
+
+	exports['default'] = {
+		props: ['obserable'],
+		name: 'zmitiindex',
+		data: function data() {
+			return {
+				imgs: _libAssetsJs.imgs,
+				show: true,
+				toastMsg: '',
+				showBtns: false,
+				showMasks: false,
+				transX: 0,
+				transY: 0,
+				index: 1, //当前的通道。en
+				createImg: ''
+
+			};
+		},
+		components: {
+			Toast: _toastToast2['default']
+		},
+
+		methods: {
+
+			entry: function entry(index) {
+				this.index = index;
+
+				var obserable = this.obserable;
+
+				obserable.trigger({
+					type: 'showVoicePage',
+					data: {
+						url: window.zmitiConfig[this.index].dataUrl,
+						voiceStyle: window.zmitiConfig[this.index].voiceStyle,
+						listClass: window.zmitiConfig[this.index].listClass
+					}
+
+				});
+			},
+
+			toast: function toast() {
+				var _this = this;
+
+				var msg = arguments.length <= 0 || arguments[0] === undefined ? '提交成功' : arguments[0];
+				var time = arguments.length <= 1 || arguments[1] === undefined ? 2000 : arguments[1];
+
+				this.toastMsg = msg;
+				setTimeout(function () {
+					_this.toastMsg = '';
+				}, time);
+			},
+
+			numstart: function numstart() {
+				//this.num =  1;
+			},
+			hideMask: function hideMask() {
+				this.showMasks = false;
+			},
+			showMask: function showMask() {
+				this.showMasks = true;
+			},
+			restart: function restart() {
+				window.location.href = window.location.href.split('?')[0];
+			},
+			afterEnter: function afterEnter() {
+				this.showBtns = true;
+			}
+
+		},
+		mounted: function mounted() {}
+	};
+
+	// </script>
+	module.exports = exports['default'];
+
+/***/ }),
+/* 11 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+
+	// load the styles
+	var content = __webpack_require__(12);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(8)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!../../node_modules/css-loader/index.js!./index.css", function() {
+				var newContent = require("!!../../node_modules/css-loader/index.js!./index.css");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
 
 /***/ }),
 /* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var __vue_script__, __vue_template__
-	__vue_script__ = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"-!babel-loader?presets[]=es2015&plugins[]=transform-runtime!../../node_modules/vue-loader/lib/selector.js?type=script&index=0!./index.vue\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()))
-	__vue_template__ = __webpack_require__(14)
-	module.exports = __vue_script__ || {}
-	if (module.exports.__esModule) module.exports = module.exports.default
-	if (__vue_template__) { (typeof module.exports === "function" ? module.exports.options : module.exports).template = __vue_template__ }
-	if (false) {(function () {  module.hot.accept()
-	  var hotAPI = require("vue-hot-reload-api")
-	  hotAPI.install(require("vue"), true)
-	  if (!hotAPI.compatible) return
-	  var id = "F:\\xuchang2018\\project\\voice\\components\\music\\index.vue"
-	  if (!module.hot.data) {
-	    hotAPI.createRecord(id, module.exports)
-	  } else {
-	    hotAPI.update(id, module.exports, __vue_template__)
-	  }
-	})()}
+	exports = module.exports = __webpack_require__(7)();
+	// imports
+
+
+	// module
+	exports.push([module.id, "/*.ant-btn:focus, .ant-btn:hover,.ant-input:focus, .ant-input:hover {\r\n    background-color: #fff;\r\n    border-color: #bf1616;\r\n    box-shadow: 0 0 0 2px rgba(191, 22, 22, 0.1);\r\n}*/\r\n.lt-full {\r\n  width: 100%;\r\n  height: 100%;\r\n  position: absolute;\r\n  left: 0;\r\n  top: 0; }\r\n\r\n.zmiti-text-overflow {\r\n  overflow: hidden;\r\n  white-space: nowrap;\r\n  word-break: break-all;\r\n  text-overflow: ellipsis;\r\n  -webkit-text-overflow: ellipsis; }\r\n\r\n.zmiti-play {\r\n  width: .8rem;\r\n  height: .8rem;\r\n  border-radius: 50%;\r\n  position: fixed;\r\n  z-index: 1000;\r\n  right: .5rem;\r\n  top: .5rem; }\r\n  .zmiti-play.rotate {\r\n    -webkit-animation: rotate 5s linear infinite;\r\n    animation: rotate 5s linear infinite; }\r\n\r\n@-webkit-keyframes rotate {\r\n  to {\r\n    -webkit-transform: rotate(360deg);\r\n    transform: rotate(360deg); } }\r\n.zmiti-index-main-ui {\r\n  overflow: hidden;\r\n  width: 10rem;\r\n  left: 50% !important;\r\n  margin-left: -375px;\r\n  background: #fcfff8; }\r\n  .zmiti-index-main-ui .zmiti-btn-group {\r\n    position: absolute;\r\n    z-index: 10;\r\n    width: 100%;\r\n    height: 100%; }\r\n    .zmiti-index-main-ui .zmiti-btn-group .zmiti-wyBtn, .zmiti-index-main-ui .zmiti-btn-group .zmiti-bzBtn, .zmiti-index-main-ui .zmiti-btn-group .zmiti-dbBtn {\r\n      position: absolute;\r\n      width: 2rem;\r\n      left: 0;\r\n      top: 60%;\r\n      -webkit-animation: scale 0.7s infinite linear alternate;\r\n      animation: scale 0.7s infinite linear alternate; }\r\n    .zmiti-index-main-ui .zmiti-btn-group .zmiti-bzBtn {\r\n      left: 4rem;\r\n      top: 73%;\r\n      -webkit-animation: scale 0.7s 0.4s infinite linear alternate;\r\n      animation: scale 0.7s 0.4s infinite linear alternate; }\r\n    .zmiti-index-main-ui .zmiti-btn-group .zmiti-wyBtn {\r\n      right: 0;\r\n      left: auto; }\r\n\r\n.zmiti-loading {\r\n  z-index: 1000; }\r\n  .zmiti-loading .zmiti-loading-ui {\r\n    width: 6rem;\r\n    left: 2rem;\r\n    position: absolute;\r\n    top: 6rem; }\r\n    .zmiti-loading .zmiti-loading-ui .zmiti-loading-bar {\r\n      width: 2rem;\r\n      border-radius: 10px;\r\n      position: relative;\r\n      margin: 0 auto; }\r\n      .zmiti-loading .zmiti-loading-ui .zmiti-loading-bar:before {\r\n        content: '';\r\n        border-radius: 10px;\r\n        position: absolute;\r\n        left: 0;\r\n        top: 0;\r\n        width: 100%;\r\n        height: 100%;\r\n        box-shadow: 0 0 3px rgba(255, 255, 255, 0.5); }\r\n      .zmiti-loading .zmiti-loading-ui .zmiti-loading-bar .zmiti-target {\r\n        width: 0.4rem;\r\n        height: 0.4rem;\r\n        border-radius: 50%;\r\n        background: #fff;\r\n        left: 50%;\r\n        top: .4rem;\r\n        position: absolute;\r\n        margin-left: -0.2rem;\r\n        -webkit-animation: scale linear 2s infinite alternate;\r\n        animation: scale linear 2s infinite alternate; }\r\n    .zmiti-loading .zmiti-loading-ui .zmiti-progress {\r\n      margin-top: .5rem;\r\n      text-align: center;\r\n      color: #fff;\r\n      font-family: Georgia;\r\n      font-size: .7rem; }\r\n\r\n/*# sourceMappingURL=index.css.map */\r\n", ""]);
+
+	// exports
+
 
 /***/ }),
-/* 13 */,
-/* 14 */
-/***/ (function(module, exports) {
-
-	module.exports = "\r\n\t<div  class=\"lt-full zmiti-music-main-ui \">\r\n\t\t<audio ref='music' v-for='audio in audios' :src='audio.src' :autoplay=\"audio.autoplay\" :loop=\"audio.loop\"></audio>\r\n\r\n\t\t<div  @click='toggleMusic' class='zmiti-play' :class='{\"rotate\":rotate}' :style=\"playStyle\">\r\n\t\t\t<img  :src='imgs.play'/>\r\n\t\t</div>\r\n\t</div>\r\n";
-
-/***/ }),
-/* 15 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	var __vue_script__, __vue_template__
-	__vue_script__ = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"-!babel-loader?presets[]=es2015&plugins[]=transform-runtime!../../node_modules/vue-loader/lib/selector.js?type=script&index=0!./index.vue\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()))
-	__vue_template__ = __webpack_require__(17)
-	module.exports = __vue_script__ || {}
-	if (module.exports.__esModule) module.exports = module.exports.default
-	if (__vue_template__) { (typeof module.exports === "function" ? module.exports.options : module.exports).template = __vue_template__ }
-	if (false) {(function () {  module.hot.accept()
-	  var hotAPI = require("vue-hot-reload-api")
-	  hotAPI.install(require("vue"), true)
-	  if (!hotAPI.compatible) return
-	  var id = "F:\\xuchang2018\\project\\voice\\components\\voice\\index.vue"
-	  if (!module.hot.data) {
-	    hotAPI.createRecord(id, module.exports)
-	  } else {
-	    hotAPI.update(id, module.exports, __vue_template__)
-	  }
-	})()}
-
-/***/ }),
-/* 16 */,
-/* 17 */
-/***/ (function(module, exports) {
-
-	module.exports = "\r\n\t<transition name='main'>\r\n\t\t<div  class=\"lt-full zmiti-tree-main-ui \" :style=\"voiceStyle.bgStyle\"  v-show='show' ref='page'>\r\n\t\t\t<ul v-swipeleft='swipeLeft' v-swiperight='swipeRight' class=\"zmiti-subject-list\"  id=\"zmiti-subject-list\" >\r\n\t\t\t\t\t<li :class=\"voice.className\" :style=\"{background:'#fff url('+imgs.imgBg+') no-repeat center top',backgroundSize:'cover'}\"\r\n\t\t\t\t\tclass=\"lt-full\" v-for='(voice,index) in voiceList' @click='entryDetail(voice)' >\r\n\t\t\t\t\t\t<div class=\"zmiti-voice-title\">\r\n\t\t\t\t\t\t\t<span hidden=\"\">通道好声音</span>\r\n\t\t\t\t\t\t\t<img :src=\"voiceStyle.titleImg\">\r\n\t\t\t\t\t\t\t<span hidden=\"\">{{index+1}}</span>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t<div class=\"zmiti-img-C\" @touchend='playAudio'>\r\n\t\t\t\t\t\t\t<img draggable='false' v-bind:src='voice.img'/>\r\n\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t<div class=\"zmiti-voice-name\">\r\n\t\t\t\t\t\t\t{{voice.name}}\r\n\t\t\t\t\t\t</div>\r\n\r\n\r\n\t\t\t\t\t\t<audio :src='voice.audio' ref='audio'></audio>\r\n\r\n\t\t\t\t\t\t<div class=\"zmiti-operator\">\r\n\t\t\t\t\t\t\t<section class=\"zmiti-start\">\r\n\t\t\t\t\t\t\t\t<img :src=\"imgs.voice\" />\r\n\t\t\t\t\t\t\t</section>\r\n\t\t\t\t\t\t\t<canvas :style=\"{background:'url('+(index === currentIndex && isPlaying ?imgs.frequency:imgs.frequency1)+') no-repeat center center',backgroundSize:'contain'}\" :id='voice.id' ref='canvas' width=\"260\" height=\"70\"></canvas>\r\n\t\t\t\t\t\t\t<section class=\"zmiti-reload\" @touchend='reloadAudio'>\r\n\t\t\t\t\t\t\t\t<img :src=\"imgs.reload\" :class='{\"rotate\":isReload && currentIndex === index}' />\r\n\t\t\t\t\t\t\t</section>\r\n\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t<div class=\"zmiti-ar\" @touchend='initRight'>\r\n\t\t\t\t\t\t\t<div></div>\r\n\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t<div class=\"zmiti-ar zmiti-ar1\" @touchend='initLeft'>\r\n\t\t\t\t\t\t\t<div></div>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\r\n\t\t\t\t\t</li>\r\n\t\t\t\t</ul>\r\n\r\n\t\t\t<div class=\"zmiti-team zmiti-btn\" @touchend='showTeam = true'>\r\n\t\t\t\t制作团队\r\n\t\t\t</div>\r\n\t\t\t\r\n\t\t\t<div  class=\" zmiti-main zmiti-btn\" @touchend='entryIndex'>\r\n\t\t\t\t主通道\r\n\t\t\t</div>\r\n\r\n\t\t\t<div  class=\" zmiti-listen zmiti-btn\" @touchend='showVoiceList'>\r\n\t\t\t\t返回\r\n\t\t\t</div>\r\n\r\n\t\t\t<div  hidden=\"\" class=\"zmiti-listen zmiti-btn\" @touchend='togglePlay'>\r\n\t\t\t\t{{isAutoPlay?'暂停':'依次收听'}}\r\n\t\t\t</div>\r\n\r\n\t\t\t<transition name='team'>\r\n\t\t\t\t<div v-if='showTeam' :style='{background:\"#fff url(\"+imgs.teamBg+\") no-repeat center top\",backgroundSize:\"cover\"}' class=\"zmiti-team-main-ui lt-full\" @touchend='showTeam = false'>\r\n\t\t\t\t\t<div class=\"zmiti-team-main\">\r\n\t\t\t\t\t\t<h1>\r\n\t\t\t\t\t\t\t<div>制作团队</div>\r\n\t\t\t\t\t\t</h1>\r\n\t\t\t\t\t\t<section><span>总策划：</span><span>刘思扬</span></section>\r\n\t\t\t\t\t\t<section><span>总监制：</span><span>刘洁</span><span>陈凯星</span><span>冯瑛冰</span></section>\r\n\t\t\t\t\t\t<section><span>统筹：</span><span>兰红光</span><span>马书平</span></section>\r\n\t\t\t\t\t\t<section><span>监制：</span><span>葛素表</span><span>陈知春</span><span>曹建礼</span><span>李代祥</span></section>\t\r\n\t\t\t\t\t\t<section><span>设计：</span><span>赵丹阳</span></section>\r\n\t\t\t\t\t\t<section><span>记者：</span><span>李尕</span><span>路滨琪</span><span>潘旭</span><span>赖星</span><span>孔令杭</span></section>\r\n\t\t\t\t\t\t<section><span>技术支持：</span><span>雷风侠工作室</span></section>\r\n\t\t\t\t\t\t<section  style=\"margin-top: 30px\" class=\"zmiti-copyright\"><span>新华社新媒体中心、摄影部联合出品</span></section>\r\n\r\n\t\t\t\t\t\t\t\r\n\t\t\t\t\t\t<div class=\"zmiti-back\">返回</div>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</transition>\r\n\r\n\t\t\t<transition name='list'>\r\n\t\t\t\t<div v-if='showList' class=\"zmiti-voice-list lt-full\" :style=\"{background:'url('+imgs.listBg+') no-repeat center top',backgroundSize:'cover'}\">\r\n\t\t\t\t\t<ul>\r\n\t\t\t\t\t\t<li >\r\n\t\t\t\t\t\t\t<div @touchend='entry(item,i)' :class='{\"show\":listIndex >= i}' v-for='(item,i) in voiceList'>\r\n\t\t\t\t\t\t\t\t<img :src=\"item.img\">\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</li>\r\n\t\t\t\t\t</ul>\r\n\t\t\t\t</div>\r\n\t\t\t</transition>\r\n\r\n\t\t\t\r\n\t\t</div>\r\n\t</transition>\r\n";
-
-/***/ }),
-/* 18 */
-/***/ (function(module, exports) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	var Obserable = (function () {
-		function Obserable() {
-			_classCallCheck(this, Obserable);
-
-			this.handlers = {};
-		}
-
-		_createClass(Obserable, [{
-			key: "on",
-			value: function on(type, handler) {
-
-				this.handlers[type] = this.handlers[type] || [];
-
-				this.off(type);
-				this.handlers[type].push({ handler: handler, type: type });
-			}
-		}, {
-			key: "off",
-			value: function off(type) {
-				var _this = this;
-
-				this.handlers[type] && this.handlers[type].forEach(function (item, i) {
-					if (item.type === type) {
-						_this.handlers[type].splice(i, 1);
-					};
-				});
-			}
-		}, {
-			key: "trigger",
-			value: function trigger(event) {
-
-				if (!event.target) {
-					event.target = this;
-				}
-
-				if (this.handlers[event.type] instanceof Array) {
-					var handlers = this.handlers[event.type]; //检出被观察者注册的观察者
-					for (var i = 0, len = handlers.length; i < len; i++) {
-						return handlers[i].handler(event.data); //回调函数执行，也就是观察者更新自己
-					}
-				}
-			}
-		}]);
-
-		return Obserable;
-	})();
-
-	exports["default"] = Obserable;
-	module.exports = exports["default"];
-
-/***/ }),
-/* 19 */
+/* 13 */
 /***/ (function(module, exports) {
 
 	"use strict";
@@ -12125,7 +12157,7 @@
 	module.exports = exports["default"];
 
 /***/ }),
-/* 20 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -12136,7 +12168,7 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
-	var _jquery = __webpack_require__(21);
+	var _jquery = __webpack_require__(15);
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
@@ -12332,7 +12364,7 @@
 	module.exports = exports["default"];
 
 /***/ }),
-/* 21 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -22152,7 +22184,1018 @@
 
 
 /***/ }),
+/* 16 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	var __vue_script__, __vue_template__
+	__webpack_require__(17)
+	__vue_script__ = __webpack_require__(19)
+	__vue_template__ = __webpack_require__(20)
+	module.exports = __vue_script__ || {}
+	if (module.exports.__esModule) module.exports = module.exports.default
+	if (__vue_template__) { (typeof module.exports === "function" ? module.exports.options : module.exports).template = __vue_template__ }
+	if (false) {(function () {  module.hot.accept()
+	  var hotAPI = require("vue-hot-reload-api")
+	  hotAPI.install(require("vue"), true)
+	  if (!hotAPI.compatible) return
+	  var id = "F:\\xuchang2018\\project\\voice\\components\\toast\\toast.vue"
+	  if (!module.hot.data) {
+	    hotAPI.createRecord(id, module.exports)
+	  } else {
+	    hotAPI.update(id, module.exports, __vue_template__)
+	  }
+	})()}
+
+/***/ }),
+/* 17 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+
+	// load the styles
+	var content = __webpack_require__(18);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(8)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!../../node_modules/css-loader/index.js!../../node_modules/vue-loader/lib/style-rewriter.js?id=_v-59bcf562&file=toast.vue!../../node_modules/vue-loader/lib/selector.js?type=style&index=0!./toast.vue", function() {
+				var newContent = require("!!../../node_modules/css-loader/index.js!../../node_modules/vue-loader/lib/style-rewriter.js?id=_v-59bcf562&file=toast.vue!../../node_modules/vue-loader/lib/selector.js?type=style&index=0!./toast.vue");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ }),
+/* 18 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(7)();
+	// imports
+
+
+	// module
+	exports.push([module.id, "\r\n\t.zmiti-toast-main-ui{\r\n\t\tposition: fixed;\r\n\t\tbackground: rgba(0,0,0,.5);\r\n\t\tcolor:#fff;\r\n\t\tborder-radius: .3rem;\r\n\t\tpadding:.3rem .5rem;\r\n\t\tleft: 50%;\r\n\t\tz-index: 111111;\r\n\t\ttop: 50%;\r\n\t\t-webkit-transform:translate3d(-50%,-50%,0);\r\n\t\t-webkit-transition:1s;\r\n\t}\r\n\t.zmiti-toast-main-ui.hide{\r\n\t\tdisplay: none;\r\n\t}\r\n", ""]);
+
+	// exports
+
+
+/***/ }),
+/* 19 */
+/***/ (function(module, exports) {
+
+	// <template>
+	// 	<div class="zmiti-toast-main-ui" :class='{"hide":msg === ""}'>
+	// 		{{msg}}
+	// 	</div>
+	// </template>
+	// <script>
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+		value: true
+	});
+	exports['default'] = {
+		props: ['msg'],
+		data: function data() {
+			return {};
+		},
+		mounted: function mounted() {}
+	};
+
+	// </script>
+	// <style>
+	// 	.zmiti-toast-main-ui{
+	// 		position: fixed;
+	// 		background: rgba(0,0,0,.5);
+	// 		color:#fff;
+	// 		border-radius: .3rem;
+	// 		padding:.3rem .5rem;
+	// 		left: 50%;
+	// 		z-index: 111111;
+	// 		top: 50%;
+	// 		-webkit-transform:translate3d(-50%,-50%,0);
+	// 		-webkit-transition:1s;
+	// 	}
+	// 	.zmiti-toast-main-ui.hide{
+	// 		display: none;
+	// 	}
+	// </style>
+	module.exports = exports['default'];
+
+/***/ }),
+/* 20 */
+/***/ (function(module, exports) {
+
+	module.exports = "\r\n\t<div class=\"zmiti-toast-main-ui\" :class='{\"hide\":msg === \"\"}'>\r\n\t\t{{msg}}\r\n\t</div>\r\n";
+
+/***/ }),
+/* 21 */
+/***/ (function(module, exports) {
+
+	module.exports = "\r\n\t<div  class=\"lt-full zmiti-index-main-ui \" :style=\"{background: 'url('+imgs.index+') no-repeat center center',backgroundSize:'cover'}\"  :class=\"{'show':show}\">\r\n\t\t\r\n\t\t<div class=\"zmiti-btn-group\">\r\n\t\t\t<div class=\"zmiti-dbBtn\" @touchend='entry(2)' >\r\n\t\t\t\t<img :src=\"imgs.dbBtn\" />\r\n\t\t\t</div>\r\n\t\t\t<div class=\"zmiti-bzBtn\" @touchend='entry(1)' >\r\n\t\t\t\t<img :src=\"imgs.bzBtn\" />\r\n\t\t\t</div>\r\n\t\t\t<div class=\"zmiti-wyBtn\" @touchend='entry(0)' >\r\n\t\t\t\t<img :src=\"imgs.wyBtn\" />\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t\t\r\n\t</div>\r\n";
+
+/***/ }),
 /* 22 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	var __vue_script__, __vue_template__
+	__vue_script__ = __webpack_require__(23)
+	__vue_template__ = __webpack_require__(24)
+	module.exports = __vue_script__ || {}
+	if (module.exports.__esModule) module.exports = module.exports.default
+	if (__vue_template__) { (typeof module.exports === "function" ? module.exports.options : module.exports).template = __vue_template__ }
+	if (false) {(function () {  module.hot.accept()
+	  var hotAPI = require("vue-hot-reload-api")
+	  hotAPI.install(require("vue"), true)
+	  if (!hotAPI.compatible) return
+	  var id = "F:\\xuchang2018\\project\\voice\\components\\music\\index.vue"
+	  if (!module.hot.data) {
+	    hotAPI.createRecord(id, module.exports)
+	  } else {
+	    hotAPI.update(id, module.exports, __vue_template__)
+	  }
+	})()}
+
+/***/ }),
+/* 23 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	// <template>
+	// 	<div  class="lt-full zmiti-music-main-ui ">
+	// 		<audio ref='music' v-for='audio in audios' :src='audio.src' :autoplay="audio.autoplay" :loop="audio.loop"></audio>
+	//
+	// 		<div  @click='toggleMusic' class='zmiti-play' :class='{"rotate":rotate}' :style="playStyle">
+	// 			<img  :src='imgs.play'/>
+	// 		</div>
+	// 	</div>
+	// </template>
+	//
+	// <script>
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+		value: true
+	});
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	var _jquery = __webpack_require__(15);
+
+	var _jquery2 = _interopRequireDefault(_jquery);
+
+	var _libAssets = __webpack_require__(13);
+
+	var audios = [];
+
+	for (var music in _libAssets.musics) {
+		audios.push(_libAssets.musics[music]);
+	}
+
+	exports['default'] = {
+		props: ['obserable'],
+		name: 'zmitiindex',
+		data: function data() {
+			return {
+				audios: audios,
+				imgs: _libAssets.imgs,
+				rotate: false,
+				playStyle: {}
+			};
+		},
+		components: {},
+
+		methods: {
+
+			toggleMusic: function toggleMusic() {
+				var music = this.$refs['music'][0];
+				music[music.paused ? 'play' : 'pause']();
+			},
+			playAudioMuted: function playAudioMuted() {
+				//静音播放
+				this.audios.forEach(function (audio, i) {
+					if (i > 0) {
+						if (audio.autoplay) {
+							audio.muted = true; //静音
+							audio.play();
+						}
+					}
+				});
+			}
+		},
+		mounted: function mounted() {
+			var _this = this;
+
+			var obserable = this.obserable;
+
+			var audio = this.$refs['music'][0];
+			var len = audio;
+			len && (0, _jquery2['default'])(audio).on('play', function () {
+				_this.rotate = true;
+			}).on('pause', function () {
+				_this.rotate = false;
+			});
+
+			len && audio.play();
+
+			audio.volume = .1;
+
+			this.playAudioMuted();
+
+			obserable.on('playVoice', function (key) {
+				_this.audios.forEach(function (audio, i) {
+					if (i > 0) {
+						if (audio.name === key) {
+							_this.$refs['music'][i].currentTime = 0;
+							_this.$refs['music'][i].muted = false; //取消静音
+							_this.$refs['music'][i].play();
+						}
+					}
+				});
+			});
+
+			obserable.on('pauseVoice', function (key) {
+				_this.audios.forEach(function (audio, i) {
+					if (i > 0) {
+						if (audio.name === key) {
+							//audio.currentTime = 0;
+							_this.$refs['music'][i].muted = false; //取消静音
+							_this.$refs['music'][i].pause();
+						}
+					}
+				});
+			});
+
+			obserable.on('setPlay', function (data) {
+
+				_this.playStyle = data;
+			});
+
+			var s = this;
+			document.addEventListener("WeixinJSBridgeReady", function () {
+				WeixinJSBridge.invoke('getNetworkType', {}, function (e) {
+					audio && (audio.volume = .1);
+					len && audio.play();
+					s.playAudioMuted();
+				});
+			}, false);
+
+			var play = function play() {
+				document.removeEventListener("WeixinJSBridgeReady", play);
+				document.removeEventListener("YixinJSBridgeReady", play);
+				len && audio.play();
+				audio && (audio.volume = .1);
+				s.playAudioMuted();
+			};
+
+			if (window.WeixinJSBridge) {
+				audio && (audio.volume = .1);
+				len && audio.play();
+				s.playAudioMuted();
+			}
+			//weixin
+			if (typeof WeixinJSBridge == "undefined") {
+				document.addEventListener("WeixinJSBridgeReady", play, false);
+				s.playAudioMuted();
+			} else {
+				//yixin
+				document.addEventListener('YixinJSBridgeReady', play, false);
+				len && audio.play();
+				s.playAudioMuted();
+			}
+
+			obserable.on('toggleBgMusic', function (data) {
+
+				var audio = _this.$refs['music'][0];
+				audio[data ? 'play' : 'pause']();
+			});
+		}
+	};
+
+	// </script>
+	module.exports = exports['default'];
+
+/***/ }),
+/* 24 */
+/***/ (function(module, exports) {
+
+	module.exports = "\r\n\t<div  class=\"lt-full zmiti-music-main-ui \">\r\n\t\t<audio ref='music' v-for='audio in audios' :src='audio.src' :autoplay=\"audio.autoplay\" :loop=\"audio.loop\"></audio>\r\n\r\n\t\t<div  @click='toggleMusic' class='zmiti-play' :class='{\"rotate\":rotate}' :style=\"playStyle\">\r\n\t\t\t<img  :src='imgs.play'/>\r\n\t\t</div>\r\n\t</div>\r\n";
+
+/***/ }),
+/* 25 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	var __vue_script__, __vue_template__
+	__vue_script__ = __webpack_require__(26)
+	__vue_template__ = __webpack_require__(29)
+	module.exports = __vue_script__ || {}
+	if (module.exports.__esModule) module.exports = module.exports.default
+	if (__vue_template__) { (typeof module.exports === "function" ? module.exports.options : module.exports).template = __vue_template__ }
+	if (false) {(function () {  module.hot.accept()
+	  var hotAPI = require("vue-hot-reload-api")
+	  hotAPI.install(require("vue"), true)
+	  if (!hotAPI.compatible) return
+	  var id = "F:\\xuchang2018\\project\\voice\\components\\voice\\index.vue"
+	  if (!module.hot.data) {
+	    hotAPI.createRecord(id, module.exports)
+	  } else {
+	    hotAPI.update(id, module.exports, __vue_template__)
+	  }
+	})()}
+
+/***/ }),
+/* 26 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	// <template>
+	// 	<transition name='main'>
+	// 		<div  class="lt-full zmiti-tree-main-ui " :style="voiceStyle.bgStyle"  v-show='show' ref='page'>
+	// 			<ul v-swipeleft='swipeLeft' v-swiperight='swipeRight' class="zmiti-subject-list"  id="zmiti-subject-list" >
+	// 					<li :class="voice.className" :style="{background:'#fff url('+imgs.imgBg+') no-repeat center top',backgroundSize:'cover'}"
+	// 					class="lt-full" v-for='(voice,index) in voiceList' @click='entryDetail(voice)' >
+	// 						<div class="zmiti-voice-title">
+	// 							<span hidden="">通道好声音</span>
+	// 							<img v-if='voiceStyle.titleImg' :src="voiceStyle.titleImg">
+	// 							<span hidden="">{{index+1}}</span>
+	// 						</div>
+	// 						<div class="zmiti-img-C" @touchend='playAudio'>
+	// 							<img draggable='false' v-bind:src='voice.img'/>
+	// 							<div>{{voice.date}}</div>
+	// 						</div>
+	//
+	// 						<div class="zmiti-voice-name" v-html='voice.name'>
+	//
+	// 						</div>
+	//
+	//
+	// 						<audio :src='voice.audio' ref='audio'></audio>
+	//
+	// 						<div class="zmiti-operator">
+	// 							<section class="zmiti-start">
+	// 								<img :src="imgs.voice" />
+	// 							</section>
+	// 							<canvas :style="{background:'url('+(index === currentIndex && isPlaying ?imgs.frequency:imgs.frequency1)+') no-repeat center center',backgroundSize:'contain'}" :id='voice.id' ref='canvas' width="260" height="70"></canvas>
+	// 							<section class="zmiti-reload" @touchend='reloadAudio'>
+	// 								<img :src="imgs.reload" :class='{"rotate":isReload && currentIndex === index}' />
+	// 							</section>
+	// 						</div>
+	//
+	// 						<div class="zmiti-ar" @touchend='initRight'>
+	// 							<div></div>
+	// 						</div>
+	//
+	// 						<div class="zmiti-ar zmiti-ar1" @touchend='initLeft'>
+	// 							<div></div>
+	// 						</div>
+	//
+	// 					</li>
+	// 				</ul>
+	//
+	// 			<div class="zmiti-team zmiti-btn" @touchend='showTeam = true'>
+	// 				制作团队
+	// 			</div>
+	//
+	// 			<div  class=" zmiti-main zmiti-btn" @touchend='entryIndex'>
+	// 				主通道
+	// 			</div>
+	//
+	// 			<div  class=" zmiti-listen zmiti-btn" @touchend='showVoiceList'>
+	// 				返回
+	// 			</div>
+	//
+	// 			<div  hidden="" class="zmiti-listen zmiti-btn" @touchend='togglePlay'>
+	// 				{{isAutoPlay?'暂停':'依次收听'}}
+	// 			</div>
+	//
+	// 			<transition name='team'>
+	// 				<div v-if='showTeam' :style='{background:"#fff url("+imgs.teamBg+") no-repeat center top",backgroundSize:"cover"}' class="zmiti-team-main-ui lt-full" @touchend='showTeam = false'>
+	// 					<div class="zmiti-team-main">
+	// 						<h1>
+	// 							<div>制作团队</div>
+	// 						</h1>
+	// 						<section><span>总策划：</span><span>刘思扬</span></section>
+	// 						<section><span>总监制：</span><span>刘洁</span><span>陈凯星</span><span>冯瑛冰</span></section>
+	// 						<section><span>统筹：</span><span>兰红光</span><span>马书平</span></section>
+	// 						<section><span>监制：</span><span>葛素表</span><span>陈知春</span><span>曹建礼</span><span>李代祥</span></section>	
+	// 						<section><span>设计：</span><span>赵丹阳</span></section>
+	// 						<section><span>记者：</span><span>李尕</span><span>路滨琪</span><span>潘旭</span><span>赖星</span><span>孔令杭</span></section>
+	// 						<section><span>技术支持：</span><span>雷风侠工作室</span></section>
+	// 						<section  style="margin-top: 30px" class="zmiti-copyright"><span>新华社新媒体中心、摄影部联合出品</span></section>
+	//
+	//
+	// 						<div class="zmiti-back">返回</div>
+	// 					</div>
+	// 				</div>
+	// 			</transition>
+	//
+	// 			<transition name='list'>
+	// 				<div v-if='showList' class="zmiti-voice-list lt-full" :style="{background:'url('+imgs.listBg+') no-repeat center top',backgroundSize:'cover'}">
+	// 					<ul :class="listClass">
+	// 						<li >
+	// 							<div @touchend='entry(item,i)' :class='{"show":listIndex >= i}' v-for='(item,i) in voiceList'>
+	// 								<img :src="item.img">
+	// 							</div>
+	// 						</li>
+	// 					</ul>
+	// 				</div>
+	// 			</transition>
+	//
+	//
+	// 		</div>
+	// 	</transition>
+	// </template>
+	//
+	// <script>
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+		value: true
+	});
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	__webpack_require__(27);
+
+	var _libAssetsJs = __webpack_require__(13);
+
+	var _jquery = __webpack_require__(15);
+
+	var _jquery2 = _interopRequireDefault(_jquery);
+
+	exports['default'] = {
+		props: ['obserable', 'pv', 'randomPv', 'nickname', 'headimgurl'],
+		name: 'zmitiindex',
+		data: function data() {
+			return {
+				imgs: _libAssetsJs.imgs,
+				showTeam: false,
+				showQrcode: false,
+				show: false,
+				viewW: window.innerWidth,
+				viewH: window.innerHeight,
+				voiceList: [],
+				isPlaying: false,
+				showMasks: false,
+				currentIndex: -1,
+				isPlaying: false,
+				lastCurrentIndex: -1,
+				isAutoPlay: false,
+				isReload: false,
+				showList: true,
+				listClass: '',
+				iNow: -1,
+				scale: 1,
+				voiceStyle: {
+					bgStyle: {}
+				},
+
+				listIndex: -1
+
+			};
+		},
+		components: {},
+
+		methods: {
+
+			entryDetail: function entryDetail() {},
+
+			togglePlay: function togglePlay() {
+				this.isAutoPlay = !this.isAutoPlay;
+				if (!this.isPlaying) {
+					this.initLeft();
+				}
+			},
+
+			loadData: function loadData(url, fn) {
+				var _this = this;
+
+				var obserable = this.obserable;
+
+				_jquery2['default'].getJSON(url, function (data) {
+					//this.initGL(data)
+					_this.voiceList = data;
+
+					console.log(data);
+
+					setTimeout(function () {
+						fn && fn();
+					}, 100);
+
+					return;
+					setTimeout(function () {
+						obserable.trigger({
+							type: 'showVoicePage'
+						});
+					}, 200);
+					//this.loadMusic(this.voiceList[0].audio,true);
+				});
+			},
+
+			entry: function entry(item, i) {
+				var scale = 0;
+
+				this.lastCurrentIndex = this.currentIndex;
+
+				/*switch(index){
+	   	case 0:
+	   	this.iNow = i;
+	   	break;
+	   	case 1:
+	   	this.iNow = i+this.list1.length;
+	   	break;
+	   	case 2:
+	   	this.iNow = i+this.list1.length+this.list2.length;
+	   	case 3:
+	   	this.iNow = i+this.list1.length+this.list2.length+this.list3.length;
+	   	case 4:
+	   	this.iNow = i+this.list1.length+this.list2.length+this.list3.length+this.list4.length;
+	   	case 5:
+	   	this.iNow = i+this.list1.length+this.list2.length+this.list3.length+this.list4.length+this.list5.length;
+	   	break;
+	   }*/
+
+				this.iNow = i;
+
+				this.showList = false;
+				this.listIndex = -1;
+
+				if (this.lastCurrentIndex <= this.iNow) {
+
+					if (this.lastCurrentIndex === this.iNow) {
+						this.playAudio();
+					} else {
+						if (!this.isLeftFirst) {
+							this.isLeftFirst = true;
+							scale = 1;
+						}
+
+						var len = this.iNow - this.lastCurrentIndex;
+						for (var k = 0; k < len; k++) {
+							//console.log(k)
+							this.initLeft();
+						}
+					}
+				} else {
+
+					if (!this.isRightFirst) {
+						this.isRightFirst = true;
+						scale = 1;
+					}
+					//console.log(this.lastCurrentIndex,this.iNow,this.lastCurrentIndex-this.iNow)
+					for (var a = 0; a < this.lastCurrentIndex - this.iNow; a++) {
+						//console.log(a);
+						this.initRight();
+					}
+				}
+
+				//this.lastCurrentIndex =this.currentIndex;
+			},
+
+			swipeLeft: function swipeLeft() {
+				var s = this;
+				this.isLeftFirst = true;
+				this.iNow = (s.currentIndex + 1) % s.voiceList.length;
+				this.initLeft();
+			},
+			swipeRight: function swipeRight() {
+				var s = this;
+				this.iNow = s.currentIndex - 1;
+				if (this.iNow < 0) {
+					this.iNow = this.voiceList.length - 1;
+				}
+				this.isRightFirst = true;
+				this.initRight();
+			},
+
+			initLeft: function initLeft() {
+				var s = this;
+
+				s.currentIndex = (s.currentIndex + 1) % s.voiceList.length;
+				//s.loadMusic(s.voiceList[s.currentIndex].audio);
+				//this.iNow = s.currentIndex;
+				var classList = ['left1 transition', 'left transition', 'active transition', 'right ', 'right1 '];
+				var voiceList = s.voiceList,
+				    currentIndex = s.currentIndex;
+
+				s.playAudio();
+
+				voiceList.forEach(function (list, i) {
+
+					if (currentIndex > i) {
+						voiceList[i].className = classList[0];
+					} else if (currentIndex < i) {
+						voiceList[i].className = classList[4];
+					}
+
+					(voiceList[currentIndex + 1] || voiceList[0])['className'] = classList[3];
+					(voiceList[currentIndex + 2] || voiceList[1])['className'] = classList[4];
+					(voiceList[currentIndex - 1] || voiceList[voiceList.length - 1])['className'] = classList[1];
+					//(voiceList[currentIndex - 2] || voiceList[voiceList.length - 2])['className'] = classList[0];
+				});
+
+				voiceList[currentIndex].className = classList[2];
+			},
+			initRight: function initRight() {
+
+				var s = this;
+				s.currentIndex = s.currentIndex - 1;
+
+				if (s.currentIndex < 0) {
+					s.currentIndex = s.voiceList.length - 1;
+				}
+				//this.iNow = s.currentIndex;
+				setTimeout(function () {
+					s.playAudio();
+				}, 10);
+				var voiceList = s.voiceList,
+				    currentIndex = s.currentIndex;
+
+				//console.log(s.currentIndex)
+
+				s.currentIndex = s.currentIndex % voiceList.length;
+
+				var classList = ['left1 ', 'left ', 'active transition', 'right transition', 'right1 transition'];
+
+				voiceList.forEach(function (list, i) {
+
+					if (currentIndex > i) {
+						voiceList[i].className = classList[0];
+					} else if (currentIndex < i) {
+						voiceList[i].className = classList[4];
+					}
+
+					(voiceList[currentIndex + 1] || voiceList[0])['className'] = classList[3];
+					(voiceList[currentIndex + 2] || voiceList[1])['className'] = classList[4];
+					(voiceList[currentIndex - 1] || voiceList[voiceList.length - 1])['className'] = classList[1];
+					//(voiceList[currentIndex - 2] || voiceList[voiceList.length - 2])['className'] = classList[0];
+				});
+
+				voiceList[currentIndex].className = classList[2];
+			},
+
+			loadMusic: function loadMusic(url) {
+				var isloaded = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+
+				var zmitiRequestAnimationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame;
+				var ac = new (window.AudioContext || window.webkitAudioContext)();
+
+				var gainNode = ac[ac.createGain ? 'createGain' : 'createGianNode']();
+
+				gainNode.connect(ac.destination);
+
+				var analyser = ac.createAnalyser();
+				analyser.fftSize = 256;
+				analyser.connect(gainNode);
+
+				this.analyser = analyser;
+				var s = this;
+				var xhr = new XMLHttpRequest();
+				xhr.open('GET', url);
+				xhr.responseType = 'arraybuffer';
+				xhr.onload = function () {
+
+					ac.decodeAudioData(xhr.response, function (buffer) {
+						var bufferSource = ac.createBufferSource();
+						bufferSource.buffer = buffer;
+						bufferSource.connect(analyser);
+						//bufferSource.connect(ac.destination);
+						bufferSource[bufferSource.start ? 'start' : 'noteOn'](0);
+
+						var arr = new Uint8Array(analyser.frequencyBinCount);
+
+						var canvas = s.$refs['canvas'][s.currentIndex];
+
+						var context = canvas.getContext('2d');
+						context.fillStyle = '#8d3836';
+						//context.fillStyle ='#fff';
+
+						var canvasW = canvas.width,
+						    canvasH = canvas.height;
+
+						function render() {
+							analyser.getByteFrequencyData(arr);
+							//console.log(arr)
+							//console.log(arr)
+							context.clearRect(0, 0, canvasW, canvasH);
+							for (var i = 0; i < 30; i++) {
+								context.fillRect(12 * i, 0, 5, arr[i + 5] / 4);
+							}
+
+							zmitiRequestAnimationFrame(render);
+						}
+
+						isloaded && render();
+					});
+				};
+				xhr.send();
+			},
+
+			audioContextAction: function audioContextAction() {
+				var ac = new (window.AudioContext || window.webkitAudioContext)();
+
+				var bufferSource = ac.createBufferSource();
+			},
+
+			visualizer: function visualizer() {},
+
+			initGL: function initGL(data) {
+				var scene = new THREE.Scene();
+
+				scene.background = new THREE.Color(0xf0f0f0);
+
+				var renderer = new THREE.WebGLRenderer();
+				renderer.setSize(this.viewW, this.viewH);
+
+				this.$refs['page'].appendChild(renderer.domElement);
+
+				var camera = new THREE.PerspectiveCamera(45, this.viewW / this.viewH, 1, 1000);
+
+				camera.position.set(0, 0, 100);
+				camera.lookAt(scene.position);
+
+				var textureLoader = new THREE.TextureLoader();
+				var imgMap = textureLoader.load(this.imgs.floor);
+
+				imgMap.wrapS = THREE.RepeatWrapping;
+				imgMap.wrapT = THREE.RepeatWrapping;
+				imgMap.anisotropy = 4;
+
+				var imgMaterial = new THREE.MeshLambertMaterial({
+					map: imgMap
+				});
+				imgMaterial.needUpdate = true;
+
+				var imgPlaneGeo = new THREE.PlaneGeometry(100, 98, 1, 1);
+				var imgMesh = new THREE.Mesh(imgPlaneGeo, imgMaterial);
+				imgMesh.position.y = -20;
+				imgMesh.rotation.x = -Math.PI * 50 / 180;
+				//imgMesh.rotation.z = Math.PI*50/180;
+
+				scene.add(imgMesh);
+
+				var r = 30;
+
+				data.length = 10;
+				var angle = 360 / data.length;
+				data.forEach(function (item, i) {
+
+					var textureLoader = new THREE.TextureLoader();
+					var imgMap = textureLoader.load(item.img);
+					var imgMaterial = new THREE.MeshLambertMaterial({
+						map: imgMap
+					});
+
+					var imgPlaneGeo = new THREE.PlaneBufferGeometry(600 / 30, 838 / 30, 100);
+					var imgMesh = new THREE.Mesh(imgPlaneGeo, imgMaterial);
+					//imgMesh.position.z = Math.cos(angle/180*Math.PI*i)*r;
+					imgMesh.position.x = i * 30;
+
+					//imgMesh.rotation.y = (angle/180*Math.PI*i);
+
+					console.log(imgMesh.rotation);
+					scene.add(imgMesh);
+				});
+
+				scene.add(new THREE.AmbientLight('#fff', .7));
+
+				function animate() {
+
+					var time = Date.now() * 0.0005;
+
+					renderer.render(scene, camera);
+					requestAnimationFrame(animate);
+				}
+
+				animate();
+			},
+
+			reloadAudio: function reloadAudio() {
+				var _this2 = this;
+
+				this.isReload = true;
+				setTimeout(function () {
+					_this2.isReload = false;
+				}, 1000);
+				this.playAudio();
+			},
+			playAudio: function playAudio() {
+				var _this3 = this;
+
+				window.ss = this;
+				this.voiceList.forEach(function (voice, i) {
+					if (i !== _this3.currentIndex) {
+						_this3.$refs['audio'][i].muted = true;
+						_this3.$refs['audio'][i].currentTime = 0;
+
+						//!this.$refs['audio'][i].paused&&this.$refs['audio'][i].pause();
+					}
+				});
+				var audio = this.$refs['audio'][this.currentIndex];
+				if (audio) {
+					audio.muted = false;
+					audio.currentTime = 0;
+					audio.play();
+				}
+			},
+			showVoiceList: function showVoiceList() {
+				var obserable = this.obserable;
+
+				obserable.trigger({ type: 'initList' });
+			},
+			entryIndex: function entryIndex() {
+				//回到主通道
+				this.show = false;
+				this.showVoiceList();
+				this.voiceList.length = 0;
+			}
+		},
+		mounted: function mounted() {
+			var _this4 = this;
+
+			var obserable = this.obserable;
+
+			obserable.on('showVoicePage', function (data) {
+				_this4.show = true;
+				_this4.currentIndex = 0;
+
+				data && data.url && _this4.loadData(data.url, function () {
+					obserable.trigger({
+						type: 'initList'
+					});
+
+					_this4.voiceList.forEach(function (voice, i) {
+						var $voice = (0, _jquery2['default'])(_this4.$refs['audio'][i]);
+						$voice.off('play').on('play', function () {
+							_this4.isPlaying = true;
+						});
+						$voice.off('pause').on('pause', function () {
+							//this.isPlaying = false;
+						});
+						$voice.off('ended').on('ended', function () {
+							if (!_this4.$refs['audio'][i].muted) {
+								_this4.isPlaying = false;
+								if (_this4.isAutoPlay) {
+									_this4.initLeft();
+								}
+							}
+						});
+
+						_this4.$refs['audio'][i].currentTime = 0;
+						_this4.$refs['audio'][i].muted = true;
+						_this4.$refs['audio'][i].play();
+					});
+				});
+
+				if (data) {
+					if (data.voiceStyle) {
+						_this4.voiceStyle = data.voiceStyle;
+					}
+					_this4.listClass = data.listClass;
+				}
+
+				/*setTimeout(()=>{
+	   	this.$refs['audio'][0].currentTime = 0;
+	   	this.$refs['audio'][0].muted =false;
+	   	this.$refs['audio'][0].play();
+	   	//this.playAudio();
+	   },10)*/
+			});
+
+			obserable.on('initList', function () {
+				_this4.showList = true;
+				var i = -1;
+				var t = setInterval(function () {
+					i++;
+					_this4.listIndex = i;
+					if (i > _this4.voiceList.length) {
+						clearInterval(t);
+					}
+				}, 60);
+			});
+		}
+	};
+
+	// </script>
+	module.exports = exports['default'];
+
+/***/ }),
+/* 27 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+
+	// load the styles
+	var content = __webpack_require__(28);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(8)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!../../node_modules/css-loader/index.js!./index.css", function() {
+				var newContent = require("!!../../node_modules/css-loader/index.js!./index.css");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ }),
+/* 28 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(7)();
+	// imports
+
+
+	// module
+	exports.push([module.id, "@charset \"UTF-8\";\r\n/*.ant-btn:focus, .ant-btn:hover,.ant-input:focus, .ant-input:hover {\r\n    background-color: #fff;\r\n    border-color: #bf1616;\r\n    box-shadow: 0 0 0 2px rgba(191, 22, 22, 0.1);\r\n}*/\r\n.lt-full {\r\n  width: 100%;\r\n  height: 100%;\r\n  position: absolute;\r\n  left: 0;\r\n  top: 0; }\r\n\r\n.zmiti-text-overflow {\r\n  overflow: hidden;\r\n  white-space: nowrap;\r\n  word-break: break-all;\r\n  text-overflow: ellipsis;\r\n  -webkit-text-overflow: ellipsis; }\r\n\r\n.zmiti-play {\r\n  width: .8rem;\r\n  height: .8rem;\r\n  border-radius: 50%;\r\n  position: fixed;\r\n  z-index: 1000;\r\n  right: .5rem;\r\n  top: .5rem; }\r\n  .zmiti-play.rotate {\r\n    -webkit-animation: rotate 5s linear infinite;\r\n    animation: rotate 5s linear infinite; }\r\n\r\n@-webkit-keyframes rotate {\r\n  to {\r\n    -webkit-transform: rotate(360deg);\r\n    transform: rotate(360deg); } }\r\n.zmiti-tree-main-ui {\r\n  overflow: hidden;\r\n  width: 10rem;\r\n  background: #fcfff8;\r\n  z-index: 110;\r\n  opacity: 1;\r\n  -webkit-transform-style: preserve-3d;\r\n  transform-style: preserve-3d;\r\n  perspective: 800px;\r\n  -webkit-perspective: 800px; }\r\n  .zmiti-tree-main-ui.main-enter-active, .zmiti-tree-main-ui.main-leave-active {\r\n    -webkit-transition: 0.5s;\r\n    transition: 0.5s; }\r\n  .zmiti-tree-main-ui.main-enter, .zmiti-tree-main-ui.main-leave-to {\r\n    opacity: 0; }\r\n  .zmiti-tree-main-ui .zmiti-btn {\r\n    position: absolute;\r\n    width: 2.4rem;\r\n    height: .8rem;\r\n    background: #fff;\r\n    line-height: .8rem;\r\n    text-align: center;\r\n    color: #ae5553;\r\n    right: .4rem;\r\n    bottom: .4rem;\r\n    border-radius: 10px; }\r\n  .zmiti-tree-main-ui .zmiti-main {\r\n    left: 3.8rem; }\r\n  .zmiti-tree-main-ui .zmiti-team {\r\n    right: auto;\r\n    left: .4rem; }\r\n  .zmiti-tree-main-ui .zmiti-list {\r\n    left: 50%;\r\n    -webkit-transform: translate3d(-50%, 0, 0);\r\n    transform: translate3d(-50%, 0, 0); }\r\n  .zmiti-tree-main-ui ul.zmiti-subject-list {\r\n    width: 7rem;\r\n    left: 1.5rem;\r\n    top: 18vh;\r\n    position: absolute;\r\n    height: 65vh;\r\n    z-index: 1; }\r\n    .zmiti-tree-main-ui ul.zmiti-subject-list:before {\r\n      content: '';\r\n      position: absolute;\r\n      width: 1125px;\r\n      height: 50%;\r\n      left: 50%;\r\n      margin-left: -562.5px;\r\n      bottom: -3rem;\r\n      background: #fefddf;\r\n      border-radius: 50%;\r\n      z-index: 0;\r\n      display: none; }\r\n    .zmiti-tree-main-ui ul.zmiti-subject-list li {\r\n      background: #fff;\r\n      border: 5px solid #e6cda4;\r\n      box-sizing: border-box;\r\n      display: -webkit-box;\r\n      -webkit-box-align: center;\r\n      -webkit-box-pack: center;\r\n      -webkit-box-orient: vertical; }\r\n      .zmiti-tree-main-ui ul.zmiti-subject-list li .zmiti-voice-title {\r\n        height: 1rem;\r\n        width: 100%;\r\n        position: absolute;\r\n        left: 0;\r\n        top: 0; }\r\n        .zmiti-tree-main-ui ul.zmiti-subject-list li .zmiti-voice-title img {\r\n          height: .5rem;\r\n          width: auto;\r\n          margin-top: .05rem; }\r\n        .zmiti-tree-main-ui ul.zmiti-subject-list li .zmiti-voice-title span {\r\n          color: #8d3836;\r\n          background: #f3eece;\r\n          border-radius: 4px;\r\n          font-size: .36rem;\r\n          padding: 8px; }\r\n          .zmiti-tree-main-ui ul.zmiti-subject-list li .zmiti-voice-title span:nth-of-type(2) {\r\n            position: absolute;\r\n            font-size: .45rem;\r\n            right: 0;\r\n            top: 0; }\r\n      .zmiti-tree-main-ui ul.zmiti-subject-list li .zmiti-voice-name {\r\n        color: #8d3836;\r\n        text-align: center;\r\n        font-size: .4rem;\r\n        /* height: 1rem;\r\n        line-height: 1rem; */\r\n        margin: .15rem auto;\r\n        width: 100%;\r\n        width: 4.4rem;\r\n        position: relative; }\r\n        .zmiti-tree-main-ui ul.zmiti-subject-list li .zmiti-voice-name:before {\r\n          position: absolute;\r\n          content: '';\r\n          bottom: 5px;\r\n          left: 0;\r\n          width: 100%;\r\n          height: 2px;\r\n          display: none;\r\n          background: -webkit-gradient(linear, left top, right top, from(rgba(225, 225, 2, 0.2)), color-stop(0.5, #e1e102), to(rgba(225, 225, 2, 0.2)));\r\n          background: -moz-linear-gradient(left, rgba(225, 225, 2, 0.2), #e1e102 50%, rgba(225, 225, 2, 0.2));\r\n          background: -ms-linear-gradient(left, rgba(225, 225, 2, 0.2), #e1e102 50%, rgba(225, 225, 2, 0.2)); }\r\n      .zmiti-tree-main-ui ul.zmiti-subject-list li .zmiti-ar {\r\n        position: absolute;\r\n        bottom: 0rem;\r\n        left: .2rem;\r\n        height: .7rem;\r\n        width: 1rem; }\r\n        .zmiti-tree-main-ui ul.zmiti-subject-list li .zmiti-ar > div {\r\n          position: absolute;\r\n          width: 1rem;\r\n          height: 3px;\r\n          background: #8d3836;\r\n          bottom: .2rem; }\r\n          .zmiti-tree-main-ui ul.zmiti-subject-list li .zmiti-ar > div:before {\r\n            content: '';\r\n            position: absolute;\r\n            width: .3rem;\r\n            height: 3px;\r\n            -webkit-transform: rotate(-45deg);\r\n            transform: rotate(-45deg);\r\n            -webkit-transform-origin: left;\r\n            transform-origin: left;\r\n            left: 0;\r\n            top: 0;\r\n            background: #8d3836; }\r\n        .zmiti-tree-main-ui ul.zmiti-subject-list li .zmiti-ar.zmiti-ar1 {\r\n          -webkit-transform: rotateY(180deg);\r\n          transform: rotateY(180deg);\r\n          right: .2rem;\r\n          left: auto; }\r\n      .zmiti-tree-main-ui ul.zmiti-subject-list li .zmiti-operator {\r\n        display: -webkit-box;\r\n        -webkit-box-align: center;\r\n        -webkit-box-pack: center;\r\n        -webkit-box-orient: horizontal;\r\n        z-index: 10012;\r\n        width: 80%;\r\n        left: 10%;\r\n        height: 80px;\r\n        top: auto;\r\n        background: #ae5553;\r\n        text-align: center; }\r\n        .zmiti-tree-main-ui ul.zmiti-subject-list li .zmiti-operator canvas {\r\n          display: block;\r\n          border: none;\r\n          border-right: 1px solid #8d3836; }\r\n        .zmiti-tree-main-ui ul.zmiti-subject-list li .zmiti-operator section {\r\n          text-align: center;\r\n          width: .8rem;\r\n          height: 100%;\r\n          -webkit-box-flex: 1;\r\n          line-height: 80px; }\r\n          .zmiti-tree-main-ui ul.zmiti-subject-list li .zmiti-operator section:nth-of-type(2) img.rotate {\r\n            -webkit-animation: rotate 1s linear;\r\n            animation: rotate 1s linear; }\r\n          .zmiti-tree-main-ui ul.zmiti-subject-list li .zmiti-operator section img {\r\n            width: .6rem; }\r\n      .zmiti-tree-main-ui ul.zmiti-subject-list li canvas {\r\n        left: 112px; }\r\n      .zmiti-tree-main-ui ul.zmiti-subject-list li.zmiti-page-item {\r\n        -webkit-transition: -webkit-transform 0.4s;\r\n        transition: transform 0.4s; }\r\n      .zmiti-tree-main-ui ul.zmiti-subject-list li .zmiti-img-C {\r\n        position: relative;\r\n        width: 4.0rem;\r\n        /* left: 50%;\r\n        margin-left: -2.3rem; */\r\n        -webkit-transform-style: preserve-3d;\r\n        transform-style: preserve-3d;\r\n        perspective: 800px;\r\n        -webkit-perspective: 800px; }\r\n        .zmiti-tree-main-ui ul.zmiti-subject-list li .zmiti-img-C > div {\r\n          position: absolute;\r\n          background: rgba(178, 77, 86, 0.75);\r\n          bottom: 0;\r\n          left: 0;\r\n          z-index: 10;\r\n          color: #fef9ea;\r\n          font-size: .3rem;\r\n          padding: .15rem;\r\n          border-top-right-radius: 18px; }\r\n        .zmiti-tree-main-ui ul.zmiti-subject-list li .zmiti-img-C:after {\r\n          content: '';\r\n          width: 100%;\r\n          height: .6rem;\r\n          border-radius: 50%;\r\n          position: absolute;\r\n          left: 0;\r\n          bottom: -1.5rem; }\r\n        .zmiti-tree-main-ui ul.zmiti-subject-list li .zmiti-img-C:before {\r\n          content: '';\r\n          position: absolute;\r\n          width: 100%;\r\n          height: 100%;\r\n          left: 0;\r\n          top: 0;\r\n          box-shadow: 0 0 0 8px #ae5553; }\r\n      .zmiti-tree-main-ui ul.zmiti-subject-list li.left {\r\n        opacity: 1;\r\n        -webkit-transform: translate3d(-5.66667rem, 0, 0) rotateY(90deg);\r\n        transform: translate3d(-5.66667rem, 0, 0) rotateY(90deg); }\r\n      .zmiti-tree-main-ui ul.zmiti-subject-list li.transition {\r\n        -webkit-transition: -webkit-transform 0.4s;\r\n        transition: transform 0.4s; }\r\n      .zmiti-tree-main-ui ul.zmiti-subject-list li.left1 {\r\n        opacity: 0;\r\n        -webkit-transform: translate3d(-750px, 0, 0) rotateY(90deg);\r\n        transform: translate3d(-750px, 0, 0) rotateY(90deg); }\r\n      .zmiti-tree-main-ui ul.zmiti-subject-list li.right {\r\n        opacity: 1;\r\n        -webkit-transform: translate3d(5.66667rem, 0, 0) rotateY(-90deg);\r\n        transform: translate3d(5.66667rem, 0, 0) rotateY(-90deg); }\r\n      .zmiti-tree-main-ui ul.zmiti-subject-list li.right1 {\r\n        opacity: 0;\r\n        -webkit-transform: translate3d(750px, 0, 0) rotateY(-90deg);\r\n        transform: translate3d(750px, 0, 0) rotateY(-90deg); }\r\n      .zmiti-tree-main-ui ul.zmiti-subject-list li.active {\r\n        -webkit-transform: rotateY(0);\r\n        transform: rotateY(0);\r\n        z-index: 100; }\r\n\r\n.zmiti-team-main-ui {\r\n  z-index: 1010;\r\n  background: #fcfff8;\r\n  display: -webkit-box;\r\n  -webkit-box-align: center;\r\n  -webkit-box-pack: center;\r\n  -webkit-box-orient: vertical;\r\n  color: #6b5419;\r\n  opacity: 1; }\r\n  .zmiti-team-main-ui.team-enter-active, .zmiti-team-main-ui.team-leave-active {\r\n    -webkit-transition: 0.5s;\r\n    transition: 0.5s; }\r\n  .zmiti-team-main-ui.team-enter, .zmiti-team-main-ui.team-leave-to {\r\n    opacity: 0; }\r\n  .zmiti-team-main-ui .zmiti-team-main {\r\n    color: #880d07;\r\n    margin-top: 1rem; }\r\n    .zmiti-team-main-ui .zmiti-team-main > h1 {\r\n      display: -webkit-box;\r\n      -webkit-box-align: center;\r\n      -webkit-box-pack: center;\r\n      -webkit-box-orient: horizontal;\r\n      width: 9.7rem;\r\n      font-weight: normal;\r\n      font-size: .6rem;\r\n      height: 2rem; }\r\n      .zmiti-team-main-ui .zmiti-team-main > h1 > div:nth-of-type(1), .zmiti-team-main-ui .zmiti-team-main > h1 > div:nth-of-type(3) {\r\n        margin-top: 40px; }\r\n    .zmiti-team-main-ui .zmiti-team-main > section {\r\n      font-size: .4rem;\r\n      width: 8rem;\r\n      margin: 0 auto;\r\n      height: 1rem;\r\n      line-height: 1rem; }\r\n      .zmiti-team-main-ui .zmiti-team-main > section.zmiti-copyright {\r\n        position: relative;\r\n        line-height: 1.6rem; }\r\n        .zmiti-team-main-ui .zmiti-team-main > section.zmiti-copyright:before {\r\n          content: '';\r\n          position: absolute;\r\n          width: 100%;\r\n          height: 1px;\r\n          background: rgba(0, 0, 0, 0.2);\r\n          left: 0;\r\n          top: 0; }\r\n      .zmiti-team-main-ui .zmiti-team-main > section span {\r\n        padding: 0 10px; }\r\n    .zmiti-team-main-ui .zmiti-team-main .zmiti-back {\r\n      background: #ebdfb5;\r\n      width: 2rem;\r\n      height: .7rem;\r\n      line-height: .7rem;\r\n      text-align: center;\r\n      border-radius: 8px;\r\n      margin: .5rem auto;\r\n      font-size: .4rem;\r\n      box-shadow: 0 4px 4px rgba(0, 0, 0, 0.5); }\r\n\r\n.zmiti-voice-list {\r\n  z-index: 1000;\r\n  margin: 0vh auto 0;\r\n  display: -webkit-box;\r\n  -webkit-box-align: center;\r\n  -webkit-box-pack: center;\r\n  -webkit-box-orient: vertical; }\r\n  .zmiti-voice-list.list-enter-active, .zmiti-voice-list.list-leave-active {\r\n    -webkit-transition: 0.5s;\r\n    transition: 0.5s; }\r\n  .zmiti-voice-list.list-enter, .zmiti-voice-list.list-leave-to {\r\n    opacity: 0; }\r\n  .zmiti-voice-list ul {\r\n    position: relative;\r\n    width: 9.8rem;\r\n    left: .1rem; }\r\n    .zmiti-voice-list ul:after {\r\n      content: '\\70B9\\51FB\\56FE\\7247\\6536\\542C';\r\n      position: absolute;\r\n      left: 50%;\r\n      top: 100%;\r\n      width: 3rem;\r\n      line-height: .7rem;\r\n      height: .7rem;\r\n      background: #fff;\r\n      font-size: .4rem;\r\n      -webkit-transform: translate3d(-50%, 0, 0) scale(0.7);\r\n      transform: translate3d(-50%, 0, 0) scale(0.7);\r\n      color: #8d3836;\r\n      text-align: center; }\r\n  .zmiti-voice-list ul.zmiti-daibiao {\r\n    left: 0; }\r\n    .zmiti-voice-list ul.zmiti-daibiao li {\r\n      width: 100%;\r\n      text-align: center; }\r\n      .zmiti-voice-list ul.zmiti-daibiao li div {\r\n        width: .9rem;\r\n        margin: .2rem .3rem .2rem 0;\r\n        font-size: 0; }\r\n        .zmiti-voice-list ul.zmiti-daibiao li div:nth-of-type(8n) {\r\n          margin-right: 0; }\r\n  .zmiti-voice-list ul.zmiti-buzhang li:last-of-type, .zmiti-voice-list ul.zmiti-weiyuan li:last-of-type {\r\n    margin: .1rem 0;\r\n    text-align: center; }\r\n    .zmiti-voice-list ul.zmiti-buzhang li:last-of-type div, .zmiti-voice-list ul.zmiti-weiyuan li:last-of-type div {\r\n      margin: .2rem .3rem .2rem 0; }\r\n      .zmiti-voice-list ul.zmiti-buzhang li:last-of-type div:nth-of-type(6n), .zmiti-voice-list ul.zmiti-weiyuan li:last-of-type div:nth-of-type(6n) {\r\n        margin-right: 0; }\r\n  .zmiti-voice-list li {\r\n    box-sizing: border-box;\r\n    display: -webkit-box;\r\n    -webkit-box-align: center;\r\n    -webkit-box-pack: center;\r\n    -webkit-box-orient: horizontal; }\r\n    .zmiti-voice-list li div {\r\n      display: inline-block;\r\n      width: 1.2rem;\r\n      box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.44);\r\n      opacity: .3; }\r\n      .zmiti-voice-list li div.show {\r\n        opacity: 1;\r\n        -webkit-transition: 0.2s opacity;\r\n        transition: 0.2s opacity; }\r\n    .zmiti-voice-list li div {\r\n      margin-right: 20px;\r\n      margin-top: 20px;\r\n      border: 1px solid #fff;\r\n      box-sizing: border-box; }\r\n      .zmiti-voice-list li div:last-of-type {\r\n        margin-right: 0; }\r\n\r\n/*# sourceMappingURL=index.css.map */\r\n", ""]);
+
+	// exports
+
+
+/***/ }),
+/* 29 */
+/***/ (function(module, exports) {
+
+	module.exports = "\r\n\t<transition name='main'>\r\n\t\t<div  class=\"lt-full zmiti-tree-main-ui \" :style=\"voiceStyle.bgStyle\"  v-show='show' ref='page'>\r\n\t\t\t<ul v-swipeleft='swipeLeft' v-swiperight='swipeRight' class=\"zmiti-subject-list\"  id=\"zmiti-subject-list\" >\r\n\t\t\t\t\t<li :class=\"voice.className\" :style=\"{background:'#fff url('+imgs.imgBg+') no-repeat center top',backgroundSize:'cover'}\"\r\n\t\t\t\t\tclass=\"lt-full\" v-for='(voice,index) in voiceList' @click='entryDetail(voice)' >\r\n\t\t\t\t\t\t<div class=\"zmiti-voice-title\">\r\n\t\t\t\t\t\t\t<span hidden=\"\">通道好声音</span>\r\n\t\t\t\t\t\t\t<img v-if='voiceStyle.titleImg' :src=\"voiceStyle.titleImg\">\r\n\t\t\t\t\t\t\t<span hidden=\"\">{{index+1}}</span>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t<div class=\"zmiti-img-C\" @touchend='playAudio'>\r\n\t\t\t\t\t\t\t<img draggable='false' v-bind:src='voice.img'/>\r\n\t\t\t\t\t\t\t<div>{{voice.date}}</div>\r\n\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t<div class=\"zmiti-voice-name\" v-html='voice.name'>\r\n\t\t\t\t\t\t\t\r\n\t\t\t\t\t\t</div>\r\n\r\n\r\n\t\t\t\t\t\t<audio :src='voice.audio' ref='audio'></audio>\r\n\r\n\t\t\t\t\t\t<div class=\"zmiti-operator\">\r\n\t\t\t\t\t\t\t<section class=\"zmiti-start\">\r\n\t\t\t\t\t\t\t\t<img :src=\"imgs.voice\" />\r\n\t\t\t\t\t\t\t</section>\r\n\t\t\t\t\t\t\t<canvas :style=\"{background:'url('+(index === currentIndex && isPlaying ?imgs.frequency:imgs.frequency1)+') no-repeat center center',backgroundSize:'contain'}\" :id='voice.id' ref='canvas' width=\"260\" height=\"70\"></canvas>\r\n\t\t\t\t\t\t\t<section class=\"zmiti-reload\" @touchend='reloadAudio'>\r\n\t\t\t\t\t\t\t\t<img :src=\"imgs.reload\" :class='{\"rotate\":isReload && currentIndex === index}' />\r\n\t\t\t\t\t\t\t</section>\r\n\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t<div class=\"zmiti-ar\" @touchend='initRight'>\r\n\t\t\t\t\t\t\t<div></div>\r\n\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t<div class=\"zmiti-ar zmiti-ar1\" @touchend='initLeft'>\r\n\t\t\t\t\t\t\t<div></div>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\r\n\t\t\t\t\t</li>\r\n\t\t\t\t</ul>\r\n\r\n\t\t\t<div class=\"zmiti-team zmiti-btn\" @touchend='showTeam = true'>\r\n\t\t\t\t制作团队\r\n\t\t\t</div>\r\n\t\t\t\r\n\t\t\t<div  class=\" zmiti-main zmiti-btn\" @touchend='entryIndex'>\r\n\t\t\t\t主通道\r\n\t\t\t</div>\r\n\r\n\t\t\t<div  class=\" zmiti-listen zmiti-btn\" @touchend='showVoiceList'>\r\n\t\t\t\t返回\r\n\t\t\t</div>\r\n\r\n\t\t\t<div  hidden=\"\" class=\"zmiti-listen zmiti-btn\" @touchend='togglePlay'>\r\n\t\t\t\t{{isAutoPlay?'暂停':'依次收听'}}\r\n\t\t\t</div>\r\n\r\n\t\t\t<transition name='team'>\r\n\t\t\t\t<div v-if='showTeam' :style='{background:\"#fff url(\"+imgs.teamBg+\") no-repeat center top\",backgroundSize:\"cover\"}' class=\"zmiti-team-main-ui lt-full\" @touchend='showTeam = false'>\r\n\t\t\t\t\t<div class=\"zmiti-team-main\">\r\n\t\t\t\t\t\t<h1>\r\n\t\t\t\t\t\t\t<div>制作团队</div>\r\n\t\t\t\t\t\t</h1>\r\n\t\t\t\t\t\t<section><span>总策划：</span><span>刘思扬</span></section>\r\n\t\t\t\t\t\t<section><span>总监制：</span><span>刘洁</span><span>陈凯星</span><span>冯瑛冰</span></section>\r\n\t\t\t\t\t\t<section><span>统筹：</span><span>兰红光</span><span>马书平</span></section>\r\n\t\t\t\t\t\t<section><span>监制：</span><span>葛素表</span><span>陈知春</span><span>曹建礼</span><span>李代祥</span></section>\t\r\n\t\t\t\t\t\t<section><span>设计：</span><span>赵丹阳</span></section>\r\n\t\t\t\t\t\t<section><span>记者：</span><span>李尕</span><span>路滨琪</span><span>潘旭</span><span>赖星</span><span>孔令杭</span></section>\r\n\t\t\t\t\t\t<section><span>技术支持：</span><span>雷风侠工作室</span></section>\r\n\t\t\t\t\t\t<section  style=\"margin-top: 30px\" class=\"zmiti-copyright\"><span>新华社新媒体中心、摄影部联合出品</span></section>\r\n\r\n\t\t\t\t\t\t\t\r\n\t\t\t\t\t\t<div class=\"zmiti-back\">返回</div>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</transition>\r\n\r\n\t\t\t<transition name='list'>\r\n\t\t\t\t<div v-if='showList' class=\"zmiti-voice-list lt-full\" :style=\"{background:'url('+imgs.listBg+') no-repeat center top',backgroundSize:'cover'}\">\r\n\t\t\t\t\t<ul :class=\"listClass\">\r\n\t\t\t\t\t\t<li >\r\n\t\t\t\t\t\t\t<div @touchend='entry(item,i)' :class='{\"show\":listIndex >= i}' v-for='(item,i) in voiceList'>\r\n\t\t\t\t\t\t\t\t<img :src=\"item.img\">\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</li>\r\n\t\t\t\t\t</ul>\r\n\t\t\t\t</div>\r\n\t\t\t</transition>\r\n\r\n\t\t\t\r\n\t\t</div>\r\n\t</transition>\r\n";
+
+/***/ }),
+/* 30 */
+/***/ (function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var Obserable = (function () {
+		function Obserable() {
+			_classCallCheck(this, Obserable);
+
+			this.handlers = {};
+		}
+
+		_createClass(Obserable, [{
+			key: "on",
+			value: function on(type, handler) {
+
+				this.handlers[type] = this.handlers[type] || [];
+
+				this.off(type);
+				this.handlers[type].push({ handler: handler, type: type });
+			}
+		}, {
+			key: "off",
+			value: function off(type) {
+				var _this = this;
+
+				this.handlers[type] && this.handlers[type].forEach(function (item, i) {
+					if (item.type === type) {
+						_this.handlers[type].splice(i, 1);
+					};
+				});
+			}
+		}, {
+			key: "trigger",
+			value: function trigger(event) {
+
+				if (!event.target) {
+					event.target = this;
+				}
+
+				if (this.handlers[event.type] instanceof Array) {
+					var handlers = this.handlers[event.type]; //检出被观察者注册的观察者
+					for (var i = 0, len = handlers.length; i < len; i++) {
+						return handlers[i].handler(event.data); //回调函数执行，也就是观察者更新自己
+					}
+				}
+			}
+		}]);
+
+		return Obserable;
+	})();
+
+	exports["default"] = Obserable;
+	module.exports = exports["default"];
+
+/***/ }),
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";

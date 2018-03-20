@@ -53,7 +53,8 @@
 					type:'showVoicePage',
 					data:{
 						url:window.zmitiConfig[this.index].dataUrl,
-						voiceStyle:window.zmitiConfig[this.index].voiceStyle
+						voiceStyle:window.zmitiConfig[this.index].voiceStyle,
+						listClass:window.zmitiConfig[this.index].listClass
 					}
 
 				});

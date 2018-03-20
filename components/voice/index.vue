@@ -6,15 +6,16 @@
 					class="lt-full" v-for='(voice,index) in voiceList' @click='entryDetail(voice)' >
 						<div class="zmiti-voice-title">
 							<span hidden="">通道好声音</span>
-							<img :src="voiceStyle.titleImg">
+							<img v-if='voiceStyle.titleImg' :src="voiceStyle.titleImg">
 							<span hidden="">{{index+1}}</span>
 						</div>
 						<div class="zmiti-img-C" @touchend='playAudio'>
 							<img draggable='false' v-bind:src='voice.img'/>
+							<div>{{voice.date}}</div>
 						</div>
 
-						<div class="zmiti-voice-name">
-							{{voice.name}}
+						<div class="zmiti-voice-name" v-html='voice.name'>
+							
 						</div>
 
 
@@ -80,7 +81,7 @@
 
 			<transition name='list'>
 				<div v-if='showList' class="zmiti-voice-list lt-full" :style="{background:'url('+imgs.listBg+') no-repeat center top',backgroundSize:'cover'}">
-					<ul>
+					<ul :class="listClass">
 						<li >
 							<div @touchend='entry(item,i)' :class='{"show":listIndex >= i}' v-for='(item,i) in voiceList'>
 								<img :src="item.img">
@@ -119,6 +120,7 @@
 				isAutoPlay:false,
 				isReload:false,
 				showList:true,
+				listClass:'',
 				iNow:-1,
 				scale:1,
 				voiceStyle:{
@@ -152,6 +154,7 @@
 					//this.initGL(data)
 					this.voiceList = data;
 
+					console.log(data);
 
 					setTimeout(()=>{
 						fn&& fn();
@@ -198,22 +201,27 @@
 				this.showList = false;
 				this.listIndex = -1;
 
+
 				if(this.lastCurrentIndex <= this.iNow){
 
-					if(!this.isLeftFirst){
-						this.isLeftFirst = true;	
-						scale =1;
-					}
+					if(this.lastCurrentIndex === this.iNow){
+						this.playAudio()
+					}else{
+						if(!this.isLeftFirst){
+							this.isLeftFirst = true;	
+							scale =1;
+						}
 
-					var len = this.iNow-this.lastCurrentIndex;
-					for(var k =0;k<len;k++){
-
-						//console.log(k)
-						
-						this.initLeft()
-						
+						var len = this.iNow-this.lastCurrentIndex;
+						for(var k =0;k<len;k++){
+							//console.log(k)
+							this.initLeft()
+							
+						}
 					}
+					
 				}else{
+
 					if(!this.isRightFirst){
 						this.isRightFirst = true;	
 						scale =1;
@@ -253,6 +261,7 @@
 			initLeft: function() {
 				var s = this;
 
+
 				
 				s.currentIndex = (s.currentIndex + 1) % s.voiceList.length;
 				//s.loadMusic(s.voiceList[s.currentIndex].audio);
@@ -286,6 +295,7 @@
 				voiceList[currentIndex].className = classList[2];
 			},
 			initRight: function() {
+
 				var s = this;
 				s.currentIndex = s.currentIndex - 1;
 
@@ -562,7 +572,10 @@
 					if(data.voiceStyle){
 						this.voiceStyle = data.voiceStyle;
 					}
+					this.listClass = data.listClass;
 				}
+
+
 
 				/*setTimeout(()=>{
 					this.$refs['audio'][0].currentTime = 0;

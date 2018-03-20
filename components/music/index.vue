@@ -63,9 +63,11 @@
 			});
 
 
-			audio.volume = .1;
+			
 
 			len && audio.play();
+
+			audio.volume = .1;
 
 			this.playAudioMuted();
 

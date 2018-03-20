@@ -46,14 +46,14 @@
     height: 100%; }
     .zmiti-index-main-ui .zmiti-btn-group .zmiti-wyBtn, .zmiti-index-main-ui .zmiti-btn-group .zmiti-bzBtn, .zmiti-index-main-ui .zmiti-btn-group .zmiti-dbBtn {
       position: absolute;
-      width: 1.4rem;
+      width: 2rem;
       left: 0;
       top: 60%;
       -webkit-animation: scale 0.7s infinite linear alternate;
       animation: scale 0.7s infinite linear alternate; }
     .zmiti-index-main-ui .zmiti-btn-group .zmiti-bzBtn {
-      left: 4.4rem;
-      top: 72%;
+      left: 4rem;
+      top: 73%;
       -webkit-animation: scale 0.7s 0.4s infinite linear alternate;
       animation: scale 0.7s 0.4s infinite linear alternate; }
     .zmiti-index-main-ui .zmiti-btn-group .zmiti-wyBtn {

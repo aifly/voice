@@ -19,15 +19,15 @@ $bgColor: #fcfff8;
 		//@include displayBox(horizontal);		
 		.zmiti-wyBtn,.zmiti-bzBtn,.zmiti-dbBtn {
 			@include pos(a);
-			width:1.4rem;
+			width:2rem;
 			left: 0;
 			top: 60%;
 			@include animation(scale .7s infinite linear alternate);
 		}
 
 		.zmiti-bzBtn{
-			left: 4.4rem;
-			top: 72%;
+			left: 4rem;
+			top: 73%;
 			@include animation(scale .7s .4s infinite linear alternate);
 		}
 		.zmiti-wyBtn{

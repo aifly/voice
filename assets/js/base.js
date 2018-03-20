@@ -4,7 +4,7 @@ var imgs = {
 	reload: './assets/images/reload.png',
 	voice: './assets/images/voice.png',
 	//voice1: './assets/images/voice.gif',
-	bg: './assets/images/bg.jpg',
+	bg: './assets/images/bg2.jpg',
 	index: './assets/images/index2.jpg',
 	frequency: './assets/images/frequency4.gif',
 	frequency1: './assets/images/frequency2.png',
@@ -14,8 +14,8 @@ var imgs = {
 	wyTongdao: './assets/images/wy-tongdao.png',
 	bzTongdao: './assets/images/bz-tongdao.png',
 	dbTongdao: './assets/images/db-tongdao.png',
-	teamBg: './assets/images/team-bg.jpg',
-	listBg: './assets/images/list-bg.jpg',
+	teamBg: './assets/images/team-bg1.jpg',
+	listBg: './assets/images/list-bg1.jpg',
 
 	logo: './assets/images/logo.png',
 
@@ -31,41 +31,35 @@ window.zmitiConfig = [
 		voiceStyle:{
 			titleImg:imgs.wyTongdao,
 			bgStyle:{
-				background:'url('+imgs.bg+') no-repeat center center',
+				background:'url('+imgs.bg+') no-repeat center top',
 				backgroundSize:'cover'
 			}
 		},
-		listStyle:{
-
-		}
+		listClass:'zmiti-weiyuan'
 	},
 	{
 		length:30,
 
 		dataUrl:'./assets/js/buzhang.json?t='+new Date().getTime(),
 		voiceStyle:{
-			titleImg:imgs.bzTongdao,
+			//titleImg:imgs.bzTongdao,
 			bgStyle:{
-				background:'url('+imgs.bg+') no-repeat center center',
+				background:'url('+imgs.bg+') no-repeat center top',
 				backgroundSize:'cover'
 			}
 		},
-		listStyle:{
-			
-		}
+		listClass:'zmiti-buzhang'
 	},{
-		length:36,
+		length:45,
 		dataUrl:'./assets/js/daibiao.json?t='+new Date().getTime(),
 		voiceStyle:{
 			titleImg:imgs.dbTongdao,
 			bgStyle:{
-				background:'url('+imgs.bg+') no-repeat center center',
+				background:'url('+imgs.bg+') no-repeat center top',
 				backgroundSize:'cover'
 			}
 		},
-		listStyle:{
-			
-		}
+		listClass:'zmiti-daibiao'
 	}
 ];
 
@@ -83,9 +77,14 @@ for(var i = 0;i<window.zmitiConfig[1].length;i++){
 	arr.push('./assets/images/buzhang/'+(i+1)+'.jpg')
 }
 
+//部长
+for(var i = 0;i<window.zmitiConfig[2].length;i++){
+	arr.push('./assets/images/daibiao/'+(i+1)+'.jpg')
+}
+
 var musics = {
 	music: {
-		src: './assets/music/bg.mp3',
+		src: './assets/music/bg3.mp3',
 		autoplay: false,
 		name: 'bg',
 		loop: true

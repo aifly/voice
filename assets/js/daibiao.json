@@ -1,3 +1,4 @@
+
 [
 
 	{
@@ -64,7 +65,7 @@
 		"id": "11",
 		"img": "./assets/images/daibiao/11.jpg",
 		"name": "张工代表",
-		"audio": "./assets/music/daibiao/11.mp3",
+		"audio": "./assets/music/daibiao/11-1.mp3",
 		"className": "right"
 	}, {
 		"id": "12",
@@ -76,7 +77,7 @@
 		"id": "13",
 		"img": "./assets/images/daibiao/13.jpg",
 		"name": "杨茂荣代表",
-		"audio": "./assets/music/daibiao/13.mp3",
+		"audio": "./assets/music/daibiao/13-1.mp3",
 		"className": "right"
 	}, {
 		"id": "14",
@@ -88,13 +89,13 @@
 		"id": "15",
 		"img": "./assets/images/daibiao/15.jpg",
 		"name": "吴光辉代表",
-		"audio": "./assets/music/daibiao/15.mp3",
+		"audio": "./assets/music/daibiao/15-1.mp3",
 		"className": "right"
 	}, {
 		"id": "16",
 		"img": "./assets/images/daibiao/16.jpg",
 		"name": "雷军代表",
-		"audio": "./assets/music/daibiao/16.mp3",
+		"audio": "./assets/music/daibiao/16-1.mp3",
 		"className": "right"
 	}, {
 		"id": "17",
@@ -196,7 +197,7 @@
 		"id": "33",
 		"img": "./assets/images/daibiao/33.jpg",
 		"name": "张宝艳代表",
-		"audio": "./assets/music/daibiao/33.mp3",
+		"audio": "./assets/music/daibiao/33-1.mp3",
 		"className": "left"
 	}, {
 		"id": "34",
@@ -215,6 +216,60 @@
 		"img": "./assets/images/daibiao/36.jpg",
 		"name": "孙丕恕代表",
 		"audio": "./assets/music/daibiao/36.mp3",
+		"className": "left"
+	}, {
+		"id": "37",
+		"img": "./assets/images/daibiao/37.jpg",
+		"name": "李书福代表",
+		"audio": "./assets/music/daibiao/37.mp3",
+		"className": "left"
+	},  {
+		"id": "38",
+		"img": "./assets/images/daibiao/38.jpg",
+		"name": "肖伟代表",
+		"audio": "./assets/music/daibiao/38.mp3",
+		"className": "left"
+	}, {
+		"id": "39",
+		"img": "./assets/images/daibiao/39.jpg",
+		"name": "杨伟代表",
+		"audio": "./assets/music/daibiao/39.mp3",
+		"className": "left"
+	}, {
+		"id": "40",
+		"img": "./assets/images/daibiao/40.jpg",
+		"name": "张全收代表",
+		"audio": "./assets/music/daibiao/40.mp3",
+		"className": "left"
+	}, {
+		"id": "41",
+		"img": "./assets/images/daibiao/41.jpg",
+		"name": "如克亚木·麦提赛地代表",
+		"audio": "./assets/music/daibiao/41.mp3",
+		"className": "left"
+	}, {
+		"id": "42",
+		"img": "./assets/images/daibiao/42.jpg",
+		"name": "马恒燕代表",
+		"audio": "./assets/music/daibiao/42.mp3",
+		"className": "left"
+	}, {
+		"id": "43",
+		"img": "./assets/images/daibiao/43.jpg",
+		"name": "王晓红代表",
+		"audio": "./assets/music/daibiao/43.mp3",
+		"className": "left"
+	},{
+		"id": "44",
+		"img": "./assets/images/daibiao/44.jpg",
+		"name": "富康年代表",
+		"audio": "./assets/music/daibiao/44.mp3",
+		"className": "left"
+	},{
+		"id": "45",
+		"img": "./assets/images/daibiao/45.jpg",
+		"name": "周异决代表",
+		"audio": "./assets/music/daibiao/45.mp3",
 		"className": "right"
 	}
 ]
